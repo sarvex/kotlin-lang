@@ -310,6 +310,12 @@ class FilesTest {
         assertEquals(2, result!!.size)
     }
 
+    test fun relativeToTest() {
+        val file1 = File("/foo/bar/baz")
+        val file2 = File("/foo/baa/ghoo")
+        assertEquals("../../bar/baz", file1.relativeTo(file2))
+    }
+
     test fun relativeTo() {
         assertEquals("kotlin", File("src/kotlin".separatorsToSystem()).relativeTo(File("src")))
         assertEquals("", File("dir").relativeTo(File("dir")))

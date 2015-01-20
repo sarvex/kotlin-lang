@@ -153,7 +153,7 @@ public fun File.relativeTo(base: File): String {
     val commonPrefLen = thisCanonical.longestCommonPrefixLen(baseCanonical)
     val thisSuffix = thisCanonical.substring(commonPrefLen + if (commonPrefLen == baseCanonical.length()) 1 else 0)
     val baseSuffix = baseCanonical.substring(commonPrefLen + if (commonPrefLen == thisCanonical.length()) 1 else 0)
-    val separator = File.separator.charAt(0)
+    val separator = File.separatorChar
     val ups = if (baseSuffix.isEmpty()) 0 else baseSuffix.count { it == separator } + 1
     val result = StringBuilder()
     for (i in 1..ups) {
