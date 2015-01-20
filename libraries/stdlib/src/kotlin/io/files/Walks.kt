@@ -185,7 +185,7 @@ public fun File.walkFileTree(walkOrder: WalkOrder = WalkOrder.PARENTS_FIRST,
     })
 }
 
-deprecated("Use walkSelectively() function instead")
+deprecated("Use walkFileTree() function instead")
 public fun File.recurse(block: (File) -> Unit): Unit {
     block(this)
     listFiles()?.forEach { it.recurse(block) }
@@ -240,28 +240,24 @@ public class TraverseStream(public val start: File,
             }
         }
 
-        fun findNextInChildrenFirstOrder(): File? {
-            if (!cursors.isEmpty() && cursor.pos == cursor.files.size() - 1) {
+        fun findNextInChildrenFirstOrder() {
+            if (cursor.pos == cursor.files.lastIndex) {
                 cursors.remove(cursors.lastIndex)
                 childrenVisited = true
-                if (cursors.isEmpty()) {
-                    return null
-                }
             } else {
                 cursor.pos++
                 childrenVisited = false
                 findBottom()
             }
-            return cursor.curFile
         }
 
-        fun findNextInParentsFirstOrder(): File? {
-            while (childrenVisited && !cursors.isEmpty() && cursor.pos == cursor.files.size() - 1) {
+        fun findNextInParentsFirstOrder() {
+            while (childrenVisited && !cursors.isEmpty() && cursor.pos == cursor.files.lastIndex) {
                 cursors.remove(cursors.lastIndex)
                 childrenVisited = true
             }
             if (cursors.isEmpty()) {
-                return null
+                return
             }
             if (childrenVisited) {
                 cursor.pos++
@@ -272,25 +268,16 @@ public class TraverseStream(public val start: File,
                     cursors.add(Cursor(files))
                 } else {
                     childrenVisited = true
-                    return findNextInParentsFirstOrder()
-                }
-            }
-            return cursor.curFile
-        }
-
-        fun findNext(): File? {
-            when (walkOrder) {
-                WalkOrder.CHILDREN_FIRST -> {
-                    findNextInChildrenFirstOrder()
-                }
-                WalkOrder.PARENTS_FIRST -> {
                     findNextInParentsFirstOrder()
                 }
             }
-            if (cursors.isEmpty()) {
-                return null
+        }
+
+        fun findNext() {
+            when (walkOrder) {
+                WalkOrder.CHILDREN_FIRST -> findNextInChildrenFirstOrder()
+                WalkOrder.PARENTS_FIRST -> findNextInParentsFirstOrder()
             }
-            return cursor.curFile
         }
 
         override fun next(): File {
