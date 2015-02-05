@@ -973,7 +973,7 @@ public class JetParsing extends AbstractJetParsing {
             errorIf(multiDecl, !local, "Multi-declarations are only allowed for local variables/values");
         }
         else {
-            parseFunctionOrPropertyName(receiverTypeDeclared, "property", propertyNameFollow);
+            parseFunctionOrPropertyName(receiverTypeDeclared, "property", propertyNameFollow, /*nameRequired = */ false);
         }
 
         myBuilder.restoreJoiningComplexTokensState();
@@ -1173,7 +1173,8 @@ public class JetParsing extends AbstractJetParsing {
         TokenSet functionNameFollow = TokenSet.create(LT, LPAR, COLON, EQ);
         boolean receiverFound = parseReceiverType("function", functionNameFollow);
 
-        parseFunctionOrPropertyName(receiverFound, "function", functionNameFollow);
+        // function as expression has no name
+        parseFunctionOrPropertyName(receiverFound, "function", functionNameFollow, /*nameRequired = */ true);
 
         myBuilder.restoreJoiningComplexTokensState();
 
@@ -1285,7 +1286,9 @@ public class JetParsing extends AbstractJetParsing {
     /*
      * IDENTIFIER
      */
-    private void parseFunctionOrPropertyName(boolean receiverFound, String title, TokenSet nameFollow) {
+    private void parseFunctionOrPropertyName(boolean receiverFound, String title, TokenSet nameFollow, boolean nameRequired) {
+        if (nameRequired && atSet(nameFollow)) return; // no name
+
         if (!receiverFound) {
             expect(IDENTIFIER, "Expecting " + title + " name or receiver type", nameFollow);
         }
