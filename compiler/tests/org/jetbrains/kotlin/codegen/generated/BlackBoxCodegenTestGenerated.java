@@ -1667,6 +1667,18 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             doTest(fileName);
         }
 
+        @TestMetadata("localClassFunClosure.kt")
+        public void testLocalClassFunClosure() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/closures/localClassFunClosure.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("localClassLambdaClosure.kt")
+        public void testLocalClassLambdaClosure() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/closures/localClassLambdaClosure.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("localFunctionInFunction.kt")
         public void testLocalFunctionInFunction() throws Exception {
             String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/closures/localFunctionInFunction.kt");
