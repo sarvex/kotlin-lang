@@ -60,15 +60,10 @@ public class DeclarationResolver {
 
     public fun checkRedeclarationsInInnerClassNames(c: TopDownAnalysisContext) {
         for (classDescriptor in c.getDeclaredClasses().values()) {
-            if (classDescriptor.getKind() == ClassKind.CLASS_OBJECT) {
-                // Class objects should be considered during analysing redeclarations in classes
-                continue
-            }
-
             var allDescriptors = classDescriptor.getScopeForMemberLookup().getOwnDeclaredDescriptors()
             val classObj = classDescriptor.getDefaultObjectDescriptor()
             if (classObj != null) {
-                val classObjDescriptors = classObj.getScopeForMemberLookup().getOwnDeclaredDescriptors()
+                val classObjDescriptors = classObj.getScopeForMemberLookup().getOwnDeclaredDescriptors().filter { it !is ClassDescriptor }
                 if (classObjDescriptors.isNotEmpty()) {
                     allDescriptors = allDescriptors + classObjDescriptors
                 }
