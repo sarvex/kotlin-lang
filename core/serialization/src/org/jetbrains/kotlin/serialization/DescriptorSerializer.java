@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.jetbrains.kotlin.resolve.DescriptorUtils.isEnumEntry;
-import static org.jetbrains.kotlin.resolve.DescriptorUtils.isObject;
 
 public class DescriptorSerializer {
 
@@ -131,9 +130,9 @@ public class DescriptorSerializer {
             }
         }
 
-        ClassDescriptor classObject = classDescriptor.getDefaultObjectDescriptor();
-        if (classObject != null) {
-            builder.setClassObjectName(stringTable.getSimpleNameIndex(classObject.getName()));
+        ClassDescriptor defaultObjectDescriptor = classDescriptor.getDefaultObjectDescriptor();
+        if (defaultObjectDescriptor != null) {
+            builder.setDefaultObjectName(stringTable.getSimpleNameIndex(defaultObjectDescriptor.getName()));
         }
 
         extension.serializeClass(classDescriptor, builder, stringTable);
