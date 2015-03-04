@@ -97,7 +97,7 @@ import org.jetbrains.kotlin.idea.codeInsight.AbstractJetInspectionTest
 import org.jetbrains.kotlin.idea.debugger.AbstractKotlinSteppingTest
 import org.jetbrains.kotlin.idea.debugger.AbstractJetPositionManagerTest
 import org.jetbrains.kotlin.completion.AbstractMultiFileJvmBasicCompletionTest
-import org.jetbrains.kotlin.idea.refactoring.introduce.introduceVariable.AbstractJetExtractionTest
+import org.jetbrains.kotlin.idea.refactoring.introduce.AbstractJetExtractionTest
 import org.jetbrains.kotlin.formatter.AbstractJetTypingIndentationTestBase
 import org.jetbrains.kotlin.idea.debugger.evaluate.AbstractKotlinEvaluateExpressionTest
 import org.jetbrains.kotlin.idea.debugger.evaluate.AbstractSelectExpressionForDebuggerTest
@@ -681,6 +681,7 @@ fun main(args: Array<String>) {
         testClass(javaClass<AbstractJetExtractionTest>()) {
             model("refactoring/introduceVariable", extension = "kt", testMethod = "doIntroduceVariableTest")
             model("refactoring/extractFunction", extension = "kt", testMethod = "doExtractFunctionTest")
+            model("refactoring/introduceProperty", extension = "kt", testMethod = "doIntroducePropertyTest")
         }
 
         testClass(javaClass<AbstractSelectExpressionForDebuggerTest>()) {
