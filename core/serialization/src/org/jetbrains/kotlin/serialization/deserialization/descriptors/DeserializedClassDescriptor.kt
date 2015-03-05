@@ -45,7 +45,9 @@ public class DeserializedClassDescriptor(
 ) {
     private val modality = deserialization.modality(Flags.MODALITY.get(classProto.getFlags()))
     private val visibility = deserialization.visibility(Flags.VISIBILITY.get(classProto.getFlags()))
-    private val kind = deserialization.classKind(Flags.CLASS_KIND.get(classProto.getFlags()))
+    private val kindFromProto = Flags.CLASS_KIND.get(classProto.getFlags())
+    private val kind = deserialization.classKind(kindFromProto)
+    private val isDefault = kindFromProto == ProtoBuf.Class.Kind.CLASS_OBJECT
     private val isInner = Flags.INNER.get(classProto.getFlags())
 
     val c = outerContext.childContext(this, classProto.getTypeParameterList(), nameResolver)
@@ -87,6 +89,8 @@ public class DeserializedClassDescriptor(
     override fun getScopeForMemberLookup() = memberScope
 
     override fun getStaticScope() = staticScope
+
+    override fun isDefaultObject(): Boolean = isDefault
 
     private fun computePrimaryConstructor(): ConstructorDescriptor? {
         if (!classProto.hasPrimaryConstructor()) return null

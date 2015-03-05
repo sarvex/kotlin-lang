@@ -930,6 +930,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/casts/notIs.kt");
             doTest(fileName);
         }
+
+        @TestMetadata("unitNullableCast.kt")
+        public void testUnitNullableCast() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/casts/unitNullableCast.kt");
+            doTest(fileName);
+        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/classes")
@@ -4039,6 +4045,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         @TestMetadata("innerGeneric.kt")
         public void testInnerGeneric() throws Exception {
             String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/innerGeneric.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("innerInfixCall.kt")
+        public void testInnerInfixCall() throws Exception {
+            String fileName = JetTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/innerInfixCall.kt");
             doTest(fileName);
         }
 
