@@ -19,8 +19,10 @@ package org.jetbrains.kotlin.idea.decompiler.navigation;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -29,6 +31,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
 import kotlin.KotlinPackage;
@@ -44,6 +47,8 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor;
 import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl;
 import org.jetbrains.kotlin.di.InjectorForLazyResolve;
+import org.jetbrains.kotlin.idea.caches.resolve.JsProjectDetector;
+import org.jetbrains.kotlin.idea.project.ProjectStructureUtil;
 import org.jetbrains.kotlin.idea.stubindex.JetFullClassNameIndex;
 import org.jetbrains.kotlin.idea.stubindex.JetTopLevelFunctionFqnNameIndex;
 import org.jetbrains.kotlin.idea.stubindex.JetTopLevelPropertyFqnNameIndex;
@@ -64,10 +69,7 @@ import org.jetbrains.kotlin.resolve.lazy.ResolveSession;
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory;
 import org.jetbrains.kotlin.types.DynamicTypesSettings;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.jetbrains.kotlin.idea.decompiler.navigation.MemberMatching.*;
 
@@ -93,14 +95,30 @@ public class JetSourceNavigationHelper {
         Project project = decompiledDeclaration.getProject();
         ProjectFileIndex projectFileIndex = ProjectFileIndex.SERVICE.getInstance(project);
 
-        if (!projectFileIndex.isInLibraryClasses(libraryFile)) {
+        boolean isJsProject = JsProjectDetector.isJsProject(project);
+
+        if (!isJsProject && !projectFileIndex.isInLibraryClasses(libraryFile)) {
             return GlobalSearchScope.EMPTY_SCOPE;
         }
 
-        Set<VirtualFile> sourceRootSet = Sets.newLinkedHashSet();
+        final Set<VirtualFile> sourceRootSet = Sets.newLinkedHashSet();
         for (OrderEntry entry : projectFileIndex.getOrderEntriesForFile(libraryFile)) {
             if (entry instanceof LibraryOrSdkOrderEntry) {
                 KotlinPackage.addAll(sourceRootSet, entry.getFiles(OrderRootType.SOURCES));
+            }
+        }
+
+        if (isJsProject) {
+            for(Module module : ModuleManager.getInstance(project).getModules()) {
+                if (ProjectStructureUtil.isJsKotlinModule(module)) {
+                    ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary(new Processor<Library>() {
+                        @Override
+                        public boolean process(Library library) {
+                            KotlinPackage.addAll(sourceRootSet, library.getFiles(OrderRootType.SOURCES));
+                            return true;
+                        }
+                    });
+                }
             }
         }
 
