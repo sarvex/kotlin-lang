@@ -201,6 +201,7 @@ private fun generatorForTests() =
             parameter<ModuleDescriptor>(useAsContext = true)
 
             publicField<DescriptorResolver>()
+            publicField<FunctionDescriptorResolver>()
             publicField<ExpressionTypingServices>()
             publicField<ExpressionTypingUtils>()
             publicField<TypeResolver>()
