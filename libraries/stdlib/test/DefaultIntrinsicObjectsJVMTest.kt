@@ -78,4 +78,15 @@ class DefaultObjectsExtensionsTest {
 
         assertEquals(s, String)
     }
+
+    enum class Bool {
+        TRUE FALSE
+    }
+
+    test fun enumTest() {
+        assertEquals(Bool.TRUE, Enum.valueOf<Bool>("TRUE"))
+        assertEquals(Bool.FALSE, Enum.valueOf<Bool>("FALSE"))
+
+        fails { Enum.valueOf<Bool>("DONT_KNOW") }
+    }
 }

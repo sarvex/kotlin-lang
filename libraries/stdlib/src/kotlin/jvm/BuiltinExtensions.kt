@@ -32,3 +32,5 @@ public val Short.Default.MAX_VALUE: Short get() = java.lang.Short.MAX_VALUE
 
 public val Byte.Default.MIN_VALUE: Byte get() = java.lang.Byte.MIN_VALUE
 public val Byte.Default.MAX_VALUE: Byte get() = java.lang.Byte.MAX_VALUE
+
+public inline fun <reified T : Enum<T>> Enum.Default.valueOf(name: String): T = java.lang.Enum.valueOf(javaClass<T>(), name)
