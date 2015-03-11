@@ -1,9 +1,9 @@
-// KT-575 Cannot ++ a class object member
+// KT-575 Cannot ++ a default object member
 
 package kt575
 
 class Creature() {
-    class object {
+    default object {
         var numCreated : Int = 0
           private set
     }
@@ -11,7 +11,7 @@ class Creature() {
     object A {
         var bbb : Int
 
-        {
+        init {
             $bbb = 1
         }
     }
@@ -19,12 +19,12 @@ class Creature() {
     class C() {
         var ccc : Int
 
-        {
+        init {
             $ccc = 2
         }
     }
 
-    {
+    init {
         Creature.numCreated++ // Error
         A.bbb++
         C().ccc++

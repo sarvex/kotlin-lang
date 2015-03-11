@@ -91,7 +91,7 @@ public class JetObjectDeclaration extends JetNamedDeclarationStub<KotlinObjectSt
         if (stub != null) {
             return stub.isDefault();
         }
-        return getClassKeyword() != null;
+        return getClassKeyword() != null || hasModifier(JetTokens.DEFAULT_KEYWORD);
     }
 
     @Override
@@ -120,11 +120,6 @@ public class JetObjectDeclaration extends JetNamedDeclarationStub<KotlinObjectSt
         if (body == null) return Collections.emptyList();
 
         return body.getAnonymousInitializers();
-    }
-
-    @Override
-    public boolean hasPrimaryConstructor() {
-        return true;
     }
 
     @Override

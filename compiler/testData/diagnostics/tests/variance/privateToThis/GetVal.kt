@@ -4,7 +4,7 @@ fun <T, R> with(receiver: T, f: T.() -> R): R = receiver.f()
 class Test<in I, out O> {
     private val i: I = getT()
 
-    ;{
+    init {
         apply(i)
         apply(this.i)
     }
@@ -26,7 +26,7 @@ class Test<in I, out O> {
         t.apply(t.<!INVISIBLE_MEMBER(i; private/*private to this*/; Test)!>i<!>)
     }
 
-    class object {
+    default object {
         fun <I, O> test(t: Test<I, O>) {
             t.apply(t.<!INVISIBLE_MEMBER(i; private/*private to this*/; Test)!>i<!>)
         }

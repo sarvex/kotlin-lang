@@ -16,12 +16,13 @@
 
 package org.jetbrains.kotlin.serialization.deserialization
 
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedTypeParameterDescriptor
-import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.serialization.ProtoBuf
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedTypeParameterDescriptor
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.utils.*
+import org.jetbrains.kotlin.utils.toReadOnlyList
 import java.util.LinkedHashMap
 
 public class TypeDeserializer(
@@ -94,18 +95,19 @@ public class TypeDeserializer(
         val id = c.nameResolver.getClassId(fqNameIndex)
         if (id.isLocal()) {
             // Local classes can't be found in scopes
-            return c.components.deserializeClass(id)
+            return c.components.localClassResolver.resolveLocalClass(id)
         }
         return c.components.moduleDescriptor.findClassAcrossModuleDependencies(id)
     }
 
-    fun typeArguments(protos: List<ProtoBuf.Type.Argument>): List<TypeProjection> =
-            protos.map { proto ->
-                val type = type(proto.getType())
-                if (proto.getProjection() == ProtoBuf.Type.Argument.Projection.STAR)
-                    StarProjectionImpl(type)
-                else TypeProjectionImpl(variance(proto.getProjection()), type)
-            }.toReadOnlyList()
+    fun typeArgument(parameter: TypeParameterDescriptor?, typeArgumentProto: ProtoBuf.Type.Argument): TypeProjection {
+        return if (typeArgumentProto.getProjection() == ProtoBuf.Type.Argument.Projection.STAR)
+            if (parameter == null)
+                TypeBasedStarProjectionImpl(KotlinBuiltIns.getInstance().getNullableAnyType())
+            else
+                StarProjectionImpl(parameter)
+        else TypeProjectionImpl(variance(typeArgumentProto.getProjection()), type(typeArgumentProto.getType()))
+    }
 
     override fun toString() = debugName + (if (parent == null) "" else ". Child of ${parent.debugName}")
 }

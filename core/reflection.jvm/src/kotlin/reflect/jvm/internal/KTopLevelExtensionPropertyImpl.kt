@@ -16,98 +16,52 @@
 
 package kotlin.reflect.jvm.internal
 
-import java.lang.reflect.*
-import kotlin.reflect.*
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import java.lang.reflect.Method
+import kotlin.reflect.IllegalPropertyAccessException
+import kotlin.reflect.KMutableTopLevelExtensionProperty
+import kotlin.reflect.KTopLevelExtensionProperty
 
 open class KTopLevelExtensionPropertyImpl<T, out R>(
-        override val name: String,
-        protected val owner: KPackageImpl,
-        protected val receiverClass: Class<T>
-) : KTopLevelExtensionProperty<T, R>, KPropertyImpl<R> {
-    override val field: Field? get() = null
+        override val container: KPackageImpl,
+        computeDescriptor: () -> PropertyDescriptor
+) : DescriptorBasedProperty(computeDescriptor), KTopLevelExtensionProperty<T, R>, KPropertyImpl<R> {
+    override val name: String get() = descriptor.getName().asString()
 
-    // TODO: extract, make lazy (weak?), use our descriptors knowledge, support Java fields
-    override val getter: Method = try {
-        owner.jClass.getMethod(getterName(name), receiverClass)
-    }
-    catch (e: NoSuchMethodException) {
-        throw NoSuchPropertyException(e)
-    }
+    override val getter: Method get() = super<DescriptorBasedProperty>.getter!!
 
     override fun get(receiver: T): R {
         try {
-            return getter(null, receiver) as R
+            [suppress("UNCHECKED_CAST")]
+            return getter.invoke(null, receiver) as R
         }
-        catch (e: java.lang.IllegalAccessException) {
-            throw kotlin.reflect.IllegalAccessException(e)
+        catch (e: IllegalAccessException) {
+            throw IllegalPropertyAccessException(e)
         }
     }
 
     override fun equals(other: Any?): Boolean =
-            other is KTopLevelExtensionPropertyImpl<*, *> && name == other.name && owner == other.owner && receiverClass == other.receiverClass
+            other is KTopLevelExtensionPropertyImpl<*, *> && descriptor == other.descriptor
 
     override fun hashCode(): Int =
-            (name.hashCode() * 31 + owner.hashCode()) * 31 + receiverClass.hashCode()
+            descriptor.hashCode()
 
-    // TODO: include visibility, return type, maybe package
     override fun toString(): String =
-            "val ${mapJavaClassToKotlin(receiverClass.getName())}.$name"
+            ReflectionObjectRenderer.renderProperty(descriptor)
 }
 
 class KMutableTopLevelExtensionPropertyImpl<T, R>(
-        name: String,
-        owner: KPackageImpl,
-        receiverClass: Class<T>
-) : KMutableTopLevelExtensionProperty<T, R>, KMutablePropertyImpl<R>, KTopLevelExtensionPropertyImpl<T, R>(name, owner, receiverClass) {
-    override val setter: Method = try {
-        owner.jClass.getMethod(setterName(name), receiverClass, getter.getReturnType()!!)
-    }
-    catch (e: NoSuchMethodException) {
-        throw NoSuchPropertyException(e)
-    }
+        container: KPackageImpl,
+        computeDescriptor: () -> PropertyDescriptor
+) : KTopLevelExtensionPropertyImpl<T, R>(container, computeDescriptor), KMutableTopLevelExtensionProperty<T, R>, KMutablePropertyImpl<R> {
+    override val setter: Method get() = super<KTopLevelExtensionPropertyImpl>.setter!!
 
     override fun set(receiver: T, value: R) {
         try {
             setter.invoke(null, receiver, value)
         }
-        catch (e: java.lang.IllegalAccessException) {
-            throw kotlin.reflect.IllegalAccessException(e)
+        catch (e: IllegalAccessException) {
+            throw IllegalPropertyAccessException(e)
         }
     }
-
-    override fun toString(): String =
-            "var ${mapJavaClassToKotlin(receiverClass.getName())}.$name"
-}
-
-suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-private fun mapJavaClassToKotlin(name: String): String {
-    if (Character.isLowerCase(name[0])) {
-        return when (name) {
-            "boolean" -> "kotlin.Boolean"
-            "char" -> "kotlin.Char"
-            "byte" -> "kotlin.Byte"
-            "short" -> "kotlin.Short"
-            "int" -> "kotlin.Int"
-            "float" -> "kotlin.Float"
-            "long" -> "kotlin.Long"
-            "double" -> "kotlin.Double"
-            else -> name
-        }
-    }
-    if (name[0] == '[') {
-        val element = (name as java.lang.String).substring(1) as java.lang.String
-        return when (element.charAt(0)) {
-            'Z' -> "kotlin.BooleanArray"
-            'C' -> "kotlin.CharArray"
-            'B' -> "kotlin.ByteArray"
-            'S' -> "kotlin.ShortArray"
-            'I' -> "kotlin.IntArray"
-            'F' -> "kotlin.FloatArray"
-            'J' -> "kotlin.LongArray"
-            'D' -> "kotlin.DoubleArray"
-            'L' -> "kotlin.Array<${mapJavaClassToKotlin(element.substring(1, element.length() - 1))}>"
-            else -> "kotlin.Array<${mapJavaClassToKotlin(element as kotlin.String)}>"
-        }
-    }
-    return name
 }

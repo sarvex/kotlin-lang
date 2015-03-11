@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.JetNodeType;
 import org.jetbrains.kotlin.lexer.JetKeywordToken;
+import org.jetbrains.kotlin.lexer.JetTokens;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class JetParsing extends AbstractJetParsing {
     private static final TokenSet TOPLEVEL_OBJECT_FIRST = TokenSet.create(TYPE_ALIAS_KEYWORD, TRAIT_KEYWORD, CLASS_KEYWORD,
                 FUN_KEYWORD, VAL_KEYWORD, PACKAGE_KEYWORD);
     private static final TokenSet ENUM_MEMBER_FIRST = TokenSet.create(TYPE_ALIAS_KEYWORD, TRAIT_KEYWORD, CLASS_KEYWORD,
-                FUN_KEYWORD, VAL_KEYWORD, IDENTIFIER);
+                FUN_KEYWORD, VAL_KEYWORD, LBRACE, IDENTIFIER, OBJECT_KEYWORD);
 
     private static final TokenSet CLASS_NAME_RECOVERY_SET = TokenSet.orSet(TokenSet.create(LT, LPAR, COLON, LBRACE), TOPLEVEL_OBJECT_FIRST);
     private static final TokenSet TYPE_PARAMETER_GT_RECOVERY_SET = TokenSet.create(WHERE_KEYWORD, LPAR, COLON, LBRACE, GT);
@@ -59,6 +60,7 @@ public class JetParsing extends AbstractJetParsing {
             TokenSet.orSet(TokenSet.create(IDENTIFIER, LBRACKET, VAL_KEYWORD, VAR_KEYWORD), MODIFIER_KEYWORDS);
     private static final TokenSet LAMBDA_VALUE_PARAMETER_FIRST =
             TokenSet.orSet(TokenSet.create(IDENTIFIER, LBRACKET), MODIFIER_KEYWORDS);
+    private static final TokenSet SOFT_KEYWORDS_AT_MEMBER_START = TokenSet.create(CONSTRUCTOR_KEYWORD, INIT_KEYWORD);
 
     static JetParsing createForTopLevel(SemanticWhitespaceAwarePsiBuilder builder) {
         JetParsing jetParsing = new JetParsing(builder);
@@ -227,8 +229,16 @@ public class JetParsing extends AbstractJetParsing {
                 break;
             }
 
+            if (at(DOT)) {
+                advance(); // DOT
+                qualifiedExpression.error("Package name must be a '.'-separated identifier list");
+                qualifiedExpression = mark();
+                continue;
+            }
+
             PsiBuilder.Marker nsName = mark();
-            if (expect(IDENTIFIER, "Package name must be a '.'-separated identifier list", PACKAGE_NAME_RECOVERY_SET)) {
+            boolean simpleNameFound = expect(IDENTIFIER, "Package name must be a '.'-separated identifier list", PACKAGE_NAME_RECOVERY_SET);
+            if (simpleNameFound) {
                 nsName.done(REFERENCE_EXPRESSION);
             }
             else {
@@ -242,8 +252,15 @@ public class JetParsing extends AbstractJetParsing {
             }
 
             if (at(DOT)) {
-                simpleName = false;
                 advance(); // DOT
+
+                if (simpleName && !simpleNameFound) {
+                    qualifiedExpression.drop();
+                    qualifiedExpression = mark();
+                }
+                else {
+                    simpleName = false;
+                }
             }
             else {
                 break;
@@ -354,7 +371,7 @@ public class JetParsing extends AbstractJetParsing {
     private void parseTopLevelObject() {
         PsiBuilder.Marker decl = mark();
 
-        TokenDetector detector = new TokenDetector(ENUM_KEYWORD);
+        ModifierDetector detector = new ModifierDetector();
         parseModifierList(MODIFIER_LIST, detector, REGULAR_ANNOTATIONS_ALLOW_SHORTS);
 
         IElementType keywordToken = tt();
@@ -364,7 +381,7 @@ public class JetParsing extends AbstractJetParsing {
 //        }
 //        else
         if (keywordToken == CLASS_KEYWORD || keywordToken == TRAIT_KEYWORD) {
-            declType = parseClass(detector.isDetected());
+            declType = parseClass(detector.isEnumDetected());
         }
         else if (keywordToken == FUN_KEYWORD) {
             declType = parseFunction();
@@ -412,6 +429,9 @@ public class JetParsing extends AbstractJetParsing {
         PsiBuilder.Marker list = mark();
         boolean empty = true;
         while (!eof()) {
+            if (annotationParsingMode.atMemberStart && atSet(SOFT_KEYWORDS_AT_MEMBER_START)) {
+                break;
+            }
             if (atSet(MODIFIER_KEYWORDS)) {
                 if (tokenConsumer != null) tokenConsumer.consume(tt());
                 advance(); // MODIFIER
@@ -682,16 +702,16 @@ public class JetParsing extends AbstractJetParsing {
 
             TokenSet constructorNameFollow = TokenSet.create(SEMICOLON, COLON, LPAR, LT, LBRACE);
             int lastId = findLastBefore(ENUM_MEMBER_FIRST, constructorNameFollow, false);
-            TokenDetector enumDetector = new TokenDetector(ENUM_KEYWORD);
-            createTruncatedBuilder(lastId).parseModifierList(MODIFIER_LIST, enumDetector, REGULAR_ANNOTATIONS_ONLY_WITH_BRACKETS);
+            ModifierDetector detector = new ModifierDetector();
+            createTruncatedBuilder(lastId).parseModifierList(MODIFIER_LIST, detector, REGULAR_ANNOTATIONS_ONLY_WITH_BRACKETS);
 
             IElementType type;
-            if (at(IDENTIFIER)) {
+            if (!atSet(SOFT_KEYWORDS_AT_MEMBER_START) && at(IDENTIFIER)) {
                 parseEnumEntry();
                 type = ENUM_ENTRY;
             }
             else {
-                type = parseMemberDeclarationRest(enumDetector.isDetected());
+                type = parseMemberDeclarationRest(detector.isEnumDetected(), detector.isDefaultDetected());
             }
 
             if (type == null) {
@@ -766,7 +786,7 @@ public class JetParsing extends AbstractJetParsing {
      *
      * memberDeclaration'
      *   : defaultObject
-     *   : constructor
+     *   : secondaryConstructor
      *   : function
      *   : property
      *   : class
@@ -779,10 +799,10 @@ public class JetParsing extends AbstractJetParsing {
     private void parseMemberDeclaration() {
         PsiBuilder.Marker decl = mark();
 
-        TokenDetector enumDetector = new TokenDetector(ENUM_KEYWORD);
-        parseModifierList(MODIFIER_LIST, enumDetector, REGULAR_ANNOTATIONS_ALLOW_SHORTS);
+        ModifierDetector detector = new ModifierDetector();
+        parseModifierList(MODIFIER_LIST, detector, REGULAR_ANNOTATIONS_ALLOW_SHORTS_AT_MEMBER_MODIFIER_LIST);
 
-        IElementType declType = parseMemberDeclarationRest(enumDetector.isDetected());
+        IElementType declType = parseMemberDeclarationRest(detector.isEnumDetected(), detector.isDefaultDetected());
 
         if (declType == null) {
             errorWithRecovery("Expecting member declaration", TokenSet.create(RBRACE));
@@ -793,12 +813,12 @@ public class JetParsing extends AbstractJetParsing {
         }
     }
 
-    private IElementType parseMemberDeclarationRest(boolean isEnum) {
+    private IElementType parseMemberDeclarationRest(boolean isEnum, boolean isDefault) {
         IElementType keywordToken = tt();
         IElementType declType = null;
         if (keywordToken == CLASS_KEYWORD) {
             if (lookahead(1) == OBJECT_KEYWORD) {
-                declType = parseDefaultObject();
+                declType = parseDeprecatedClassObject();
             }
             else {
                 declType = parseClass(isEnum);
@@ -817,14 +837,82 @@ public class JetParsing extends AbstractJetParsing {
             declType = parseTypeAlias();
         }
         else if (keywordToken == OBJECT_KEYWORD) {
-            parseObject(NameParsingMode.REQUIRED, true);
+            parseObject(isDefault ? NameParsingMode.ALLOWED : NameParsingMode.REQUIRED, true);
             declType = OBJECT_DECLARATION;
         }
         else if (keywordToken == LBRACE) {
             parseBlock();
             declType = ANONYMOUS_INITIALIZER;
         }
+        else if (at(INIT_KEYWORD)) {
+            advance(); // init
+            parseBlock();
+            declType = ANONYMOUS_INITIALIZER;
+        }
+        else if (at(CONSTRUCTOR_KEYWORD)) {
+            parseSecondaryConstructor();
+            declType = SECONDARY_CONSTRUCTOR;
+        }
         return declType;
+    }
+
+    /*
+     * secondaryConstructor
+     *   : modifiers "constructor" valueParameters (":" constructorDelegationCall)? block
+     * constructorDelegationCall
+     *   : "this" valueArguments
+     *   : "super" valueArguments
+     */
+    private void parseSecondaryConstructor() {
+        assert _at(CONSTRUCTOR_KEYWORD);
+
+        advance(); // CONSTRUCTOR_KEYWORD
+
+        TokenSet valueArgsRecoverySet = TokenSet.create(COLON, LBRACE, SEMICOLON, RPAR);
+        if (at(LPAR)) {
+            parseValueParameterList(false, valueArgsRecoverySet);
+        }
+        else {
+            errorWithRecovery("Expecting '('", valueArgsRecoverySet);
+        }
+
+        if (at(COLON)) {
+            advance(); // COLON
+
+            PsiBuilder.Marker delegationCall = mark();
+
+            if (at(THIS_KEYWORD) || at(SUPER_KEYWORD)) {
+                parseThisOrSuper();
+            }
+            else {
+                // if we're on LPAR it's probably start of value arguments list
+                if (!at(LPAR)) {
+                    advance(); // wrong delegation call keyword?
+                }
+                error("Expecting a 'this' or 'super' constructor call");
+            }
+
+            myExpressionParsing.parseValueArgumentList();
+
+            delegationCall.done(CONSTRUCTOR_DELEGATION_CALL);
+        }
+        else {
+            // empty constructor delegation call
+            PsiBuilder.Marker emptyDelegationCall = mark();
+            mark().done(CONSTRUCTOR_DELEGATION_REFERENCE);
+            emptyDelegationCall.done(CONSTRUCTOR_DELEGATION_CALL);
+        }
+
+        parseBlock();
+    }
+
+    private void parseThisOrSuper() {
+        assert _at(THIS_KEYWORD) || _at(SUPER_KEYWORD);
+        PsiBuilder.Marker mark = mark();
+
+        advance(); // THIS_KEYWORD | SUPER_KEYWORD
+
+        mark.done(CONSTRUCTOR_DELEGATION_REFERENCE);
     }
 
     /*
@@ -843,7 +931,6 @@ public class JetParsing extends AbstractJetParsing {
 
     /*
      * initializer
-     *   : annotations "this" valueArguments
      *   : annotations constructorInvocation // type parameters may (must?) be omitted
      *   ;
      */
@@ -852,20 +939,14 @@ public class JetParsing extends AbstractJetParsing {
         parseAnnotations(REGULAR_ANNOTATIONS_ONLY_WITH_BRACKETS);
 
         IElementType type;
-        if (at(THIS_KEYWORD)) {
-            PsiBuilder.Marker mark = mark();
-            advance(); // THIS_KEYWORD
-            mark.done(THIS_CONSTRUCTOR_REFERENCE);
-            type = THIS_CALL;
-        }
-        else if (atSet(TYPE_REF_FIRST)) {
+        if (atSet(TYPE_REF_FIRST)) {
             PsiBuilder.Marker reference = mark();
             parseTypeRef();
             reference.done(CONSTRUCTOR_CALLEE);
             type = DELEGATOR_SUPER_CALL;
         }
         else {
-            errorWithRecovery("Expecting constructor call (this(...)) or supertype initializer",
+            errorWithRecovery("Expecting constructor call (<class-name>(...))",
                               TokenSet.orSet(TOPLEVEL_OBJECT_FIRST, TokenSet.create(RBRACE, LBRACE, COMMA, SEMICOLON)));
             initializer.drop();
             return;
@@ -880,7 +961,7 @@ public class JetParsing extends AbstractJetParsing {
      *   : modifiers "class" object
      *   ;
      */
-    private IElementType parseDefaultObject() {
+    private IElementType parseDeprecatedClassObject() {
         assert _at(CLASS_KEYWORD) && lookahead(1) == OBJECT_KEYWORD;
         advance(); // CLASS_KEYWORD
         parseObject(NameParsingMode.ALLOWED, true);
@@ -1990,24 +2071,26 @@ public class JetParsing extends AbstractJetParsing {
         return createForTopLevel(builder);
     }
 
-    /*package*/ static class TokenDetector implements Consumer<IElementType> {
-
-        private boolean detected = false;
-        private final TokenSet tokens;
-
-        public TokenDetector(JetKeywordToken token) {
-            this.tokens = TokenSet.create(token);
-        }
+    /*package*/ static class ModifierDetector implements Consumer<IElementType> {
+        private boolean enumDetected = false;
+        private boolean defaultDetected = false;
 
         @Override
         public void consume(IElementType item) {
-            if (tokens.contains(item)) {
-                detected = true;
+            if (item == JetTokens.ENUM_KEYWORD) {
+                enumDetected = true;
+            }
+            else if (item == JetTokens.DEFAULT_KEYWORD) {
+                defaultDetected = true;
             }
         }
 
-        public boolean isDetected() {
-            return detected;
+        public boolean isEnumDetected() {
+            return enumDetected;
+        }
+
+        public boolean isDefaultDetected() {
+            return defaultDetected;
         }
     }
 
@@ -2015,14 +2098,21 @@ public class JetParsing extends AbstractJetParsing {
         FILE_ANNOTATIONS_BEFORE_PACKAGE(false, true),
         FILE_ANNOTATIONS_WHEN_PACKAGE_OMITTED(false, true),
         REGULAR_ANNOTATIONS_ONLY_WITH_BRACKETS(false, false),
-        REGULAR_ANNOTATIONS_ALLOW_SHORTS(true, false);
+        REGULAR_ANNOTATIONS_ALLOW_SHORTS(true, false),
+        REGULAR_ANNOTATIONS_ALLOW_SHORTS_AT_MEMBER_MODIFIER_LIST(true, false, true);
 
         boolean allowShortAnnotations;
         boolean isFileAnnotationParsingMode;
+        boolean atMemberStart = false;
 
         AnnotationParsingMode(boolean allowShortAnnotations, boolean onlyFileAnnotations) {
             this.allowShortAnnotations = allowShortAnnotations;
             this.isFileAnnotationParsingMode = onlyFileAnnotations;
+        }
+
+        AnnotationParsingMode(boolean allowShortAnnotations, boolean onlyFileAnnotations, boolean atMemberStart) {
+            this(allowShortAnnotations, onlyFileAnnotations);
+            this.atMemberStart = atMemberStart;
         }
     }
 }

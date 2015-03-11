@@ -5,7 +5,7 @@ class Test<in I, out O> {
     private var i: I = getT()
     private val j: I
 
-    ;{
+    init {
         j = getT()
         i = getT()
         this.i = getT()
@@ -26,7 +26,7 @@ class Test<in I, out O> {
         t.<!INVISIBLE_MEMBER(i; private/*private to this*/; Test)!>i<!> = getT()
     }
 
-    class object {
+    default object {
         fun <I, O> test(t: Test<I, O>) {
             t.<!INVISIBLE_MEMBER(i; private/*private to this*/; Test)!>i<!> = getT()
         }

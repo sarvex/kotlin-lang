@@ -36,8 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.jetbrains.kotlin.diagnostics.Errors.MANY_DEFAULT_OBJECTS;
-import static org.jetbrains.kotlin.diagnostics.Errors.UNSUPPORTED;
+import static org.jetbrains.kotlin.diagnostics.Errors.*;
 
 public class LazyTopDownAnalyzer {
     private BindingTrace trace;
@@ -123,8 +122,6 @@ public class LazyTopDownAnalyzer {
             @NotNull Collection<? extends PsiElement> declarations,
             @NotNull DataFlowInfo outerDataFlowInfo
     ) {
-        assert topDownAnalysisParameters.isLazy() : "Lazy analyzer is run in non-lazy mode";
-
         final TopDownAnalysisContext c = new TopDownAnalysisContext(topDownAnalysisParameters, outerDataFlowInfo);
 
         final Multimap<FqName, JetElement> topLevelFqNames = HashMultimap.create();
@@ -191,19 +188,25 @@ public class LazyTopDownAnalyzer {
                             registerDeclarations(classOrObject.getDeclarations());
                             registerTopLevelFqName(topLevelFqNames, classOrObject, descriptor);
 
-                            checkManyDefaultObjects(classOrObject);
+                            checkClassOrObjectDeclarations(classOrObject, descriptor);
                         }
 
-                        private void checkManyDefaultObjects(JetClassOrObject classOrObject) {
+                        private void checkClassOrObjectDeclarations(JetClassOrObject classOrObject, ClassDescriptor classDescriptor) {
                             boolean defaultObjectAlreadyFound = false;
                             for (JetDeclaration jetDeclaration : classOrObject.getDeclarations()) {
-                                jetDeclaration.accept(this);
-
                                 if (jetDeclaration instanceof JetObjectDeclaration && ((JetObjectDeclaration) jetDeclaration).isDefault()) {
                                     if (defaultObjectAlreadyFound) {
                                         trace.report(MANY_DEFAULT_OBJECTS.on((JetObjectDeclaration) jetDeclaration));
                                     }
                                     defaultObjectAlreadyFound = true;
+                                }
+                                else if (jetDeclaration instanceof JetSecondaryConstructor) {
+                                    if (DescriptorUtils.isSingletonOrAnonymousObject(classDescriptor)) {
+                                        trace.report(SECONDARY_CONSTRUCTOR_IN_OBJECT.on((JetSecondaryConstructor) jetDeclaration));
+                                    }
+                                    else if (classDescriptor.getKind() == ClassKind.TRAIT) {
+                                        trace.report(CONSTRUCTOR_IN_TRAIT.on(jetDeclaration));
+                                    }
                                 }
                             }
                         }
@@ -211,7 +214,6 @@ public class LazyTopDownAnalyzer {
                         @Override
                         public void visitClass(@NotNull JetClass klass) {
                             visitClassOrObject(klass);
-
                             registerPrimaryConstructorParameters(klass);
                         }
 
@@ -224,6 +226,20 @@ public class LazyTopDownAnalyzer {
                                     );
                                 }
                             }
+                        }
+
+                        @Override
+                        public void visitSecondaryConstructor(@NotNull JetSecondaryConstructor constructor) {
+                            ClassDescriptor classDescriptor =
+                                    (ClassDescriptor) lazyDeclarationResolver.resolveToDescriptor(constructor.getClassOrObject());
+                            if (!DescriptorUtils.canHaveSecondaryConstructors(classDescriptor)) {
+                                return;
+                            }
+                            c.getSecondaryConstructors().put(
+                                    constructor,
+                                    (ConstructorDescriptor) lazyDeclarationResolver.resolveToDescriptor(constructor)
+                            );
+                            registerScope(c, constructor);
                         }
 
                         @Override
@@ -276,7 +292,7 @@ public class LazyTopDownAnalyzer {
         resolveAllHeadersInClasses(c);
 
         declarationResolver.checkRedeclarationsInPackages(topLevelDescriptorProvider, topLevelFqNames);
-        declarationResolver.checkRedeclarationsInInnerClassNames(c);
+        declarationResolver.checkRedeclarations(c);
 
         ResolveUtilPackage.checkTraitRequirements(c.getDeclaredClasses(), trace);
 

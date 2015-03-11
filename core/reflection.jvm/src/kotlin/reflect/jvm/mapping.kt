@@ -16,7 +16,9 @@
 
 package kotlin.reflect.jvm
 
-import java.lang.reflect.*
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.*
 import kotlin.reflect.jvm.internal.*
@@ -37,7 +39,8 @@ public val KMutableProperty<*>.javaSetter: Method?
     get() = (this as? KMutablePropertyImpl<*>)?.setter
 
 
-// TODO: val KTopLevelVariable<*>.javaField: Field
+public val KTopLevelVariable<*>.javaField: Field?
+    get() = (this as KPropertyImpl<*>).field
 
 public val KTopLevelVariable<*>.javaGetter: Method
     get() = (this as KTopLevelVariableImpl<*>).getter
@@ -61,7 +64,7 @@ public val KMemberProperty<*, *>.javaField: Field?
 
 // TODO: getstatic $kotlinClass or go to foreignKClasses
 public val <T> Class<T>.kotlin: KClass<T>
-    get() = KClassImpl(this, false)
+    get() = KClassImpl(this)
 
 // TODO: getstatic $kotlinPackage
 public val Class<*>.kotlinPackage: KPackage
@@ -71,7 +74,7 @@ public val Class<*>.kotlinPackage: KPackage
 public val Field.kotlin: KProperty<*>
     get() {
         val clazz = getDeclaringClass()
-        val name = getName()!!
+        val name = getName()
         val modifiers = getModifiers()
         val static = Modifier.isStatic(modifiers)
         val final = Modifier.isFinal(modifiers)
@@ -84,4 +87,3 @@ public val Field.kotlin: KProperty<*>
             return if (final) Reflection.memberProperty(name, kClass) else Reflection.mutableMemberProperty(name, kClass)
         }
     }
-

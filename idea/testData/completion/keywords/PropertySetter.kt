@@ -31,4 +31,6 @@ class Some {
 // EXIST:  var
 // EXIST:  vararg
 /*why?*/
-// NUMBER: 23
+// EXIST:  constructor
+// EXIST:  init
+// NUMBER: 26

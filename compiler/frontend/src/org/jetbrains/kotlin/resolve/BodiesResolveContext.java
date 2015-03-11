@@ -17,15 +17,11 @@
 package org.jetbrains.kotlin.resolve;
 
 import com.google.common.base.Function;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.ReadOnly;
 import org.jetbrains.kotlin.context.GlobalContext;
-import org.jetbrains.kotlin.descriptors.ClassDescriptorWithResolutionScopes;
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor;
-import org.jetbrains.kotlin.descriptors.ScriptDescriptor;
-import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo;
 import org.jetbrains.kotlin.resolve.scopes.JetScope;
@@ -51,6 +47,8 @@ public interface BodiesResolveContext extends GlobalContext {
     @Mutable
     Map<JetClassInitializer, ClassDescriptorWithResolutionScopes> getAnonymousInitializers();
     @Mutable
+    Map<JetSecondaryConstructor, ConstructorDescriptor> getSecondaryConstructors();
+    @Mutable
     Map<JetScript, ScriptDescriptor> getScripts();
 
     @Mutable
@@ -63,6 +61,4 @@ public interface BodiesResolveContext extends GlobalContext {
 
     @NotNull
     TopDownAnalysisParameters getTopDownAnalysisParameters();
-
-    boolean completeAnalysisNeeded(@NotNull PsiElement element);
 }

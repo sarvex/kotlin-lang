@@ -16,11 +16,9 @@
 
 package org.jetbrains.kotlin.jvm.compiler;
 
-import com.google.common.base.Predicates;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
@@ -82,10 +80,12 @@ public final class LoadDescriptorUtil {
     public static Pair<PackageViewDescriptor, BindingContext> loadTestPackageAndBindingContextFromJavaRoot(
             @NotNull File javaRoot,
             @NotNull Disposable disposable,
+            @NotNull TestJdkKind testJdkKind,
             @NotNull ConfigurationKind configurationKind
     ) {
         CompilerConfiguration configuration = JetTestUtils.compilerConfigurationForTests(
-                configurationKind, TestJdkKind.MOCK_JDK,
+                configurationKind,
+                testJdkKind,
                 JetTestUtils.getAnnotationsJar(),
                 javaRoot,
                 new File("compiler/tests") // for @ExpectLoadError annotation
@@ -102,19 +102,7 @@ public final class LoadDescriptorUtil {
         return Pair.create(packageView, trace.getBindingContext());
     }
 
-    @NotNull
-    public static Pair<PackageViewDescriptor, BindingContext> compileJavaAndLoadTestPackageAndBindingContextFromBinary(
-            @NotNull Collection<File> javaFiles,
-            @NotNull File outDir,
-            @NotNull Disposable disposable,
-            @NotNull ConfigurationKind configurationKind
-    )
-            throws IOException {
-        compileJavaWithAnnotationsJar(javaFiles, outDir);
-        return loadTestPackageAndBindingContextFromJavaRoot(outDir, disposable, configurationKind);
-    }
-
-    private static void compileJavaWithAnnotationsJar(@NotNull Collection<File> javaFiles, @NotNull File outDir) throws IOException {
+    public static void compileJavaWithAnnotationsJar(@NotNull Collection<File> javaFiles, @NotNull File outDir) throws IOException {
         String classPath = ForTestCompileRuntime.runtimeJarForTests() + File.pathSeparator +
                            JetTestUtils.getAnnotationsJar().getPath();
         JetTestUtils.compileJavaFiles(javaFiles, Arrays.asList(
@@ -145,7 +133,7 @@ public final class LoadDescriptorUtil {
                 }
             });
             AnalysisResult result = JvmResolveUtil.analyzeFilesWithJavaIntegrationAndCheckForErrors(
-                    jetCoreEnvironment.getProject(), jetFiles, Predicates.<PsiFile>alwaysTrue());
+                    jetCoreEnvironment.getProject(), jetFiles);
             return new JetFilesAndAnalysisResult(jetFiles, result);
         }
 

@@ -5,8 +5,8 @@
 // ERROR: Unresolved reference: foo
 
 class A {
-    class object {
-        {
+    default object {
+        init {
             val t: Int = <caret>foo
         }
     }

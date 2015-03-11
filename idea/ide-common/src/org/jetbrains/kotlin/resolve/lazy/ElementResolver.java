@@ -18,9 +18,7 @@ package org.jetbrains.kotlin.resolve.lazy;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.base.Predicates;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import kotlin.KotlinPackage;
 import org.jetbrains.annotations.NotNull;
@@ -79,6 +77,7 @@ public abstract class ElementResolver {
                 jetElement,
                 JetNamedFunction.class,
                 JetClassInitializer.class,
+                JetSecondaryConstructor.class,
                 JetProperty.class,
                 JetParameter.class,
                 JetDelegationSpecifierList.class,
@@ -114,7 +113,7 @@ public abstract class ElementResolver {
         }
 
         JetDeclaration declaration = PsiTreeUtil.getParentOfType(jetElement, JetDeclaration.class, false);
-        if (declaration != null) {
+        if (declaration != null && !(declaration instanceof JetClassInitializer)) {
             // Activate descriptor resolution
             resolveSession.resolveToDescriptor(declaration);
         }
@@ -151,6 +150,9 @@ public abstract class ElementResolver {
         }
         else if (resolveElement instanceof JetClassInitializer) {
             initializerAdditionalResolve(resolveSession, (JetClassInitializer) resolveElement, trace, file, statementFilter);
+        }
+        else if (resolveElement instanceof JetSecondaryConstructor) {
+            secondaryConstructorAdditionalResolve(resolveSession, (JetSecondaryConstructor) resolveElement, trace, file, statementFilter);
         }
         else if (resolveElement instanceof JetProperty) {
             propertyAdditionalResolve(resolveSession, (JetProperty) resolveElement, trace, file, statementFilter);
@@ -407,6 +409,21 @@ public abstract class ElementResolver {
         bodyResolver.resolveFunctionBody(createEmptyContext(resolveSession), trace, namedFunction, functionDescriptor, scope);
     }
 
+    private void secondaryConstructorAdditionalResolve(
+            ResolveSession resolveSession,
+            JetSecondaryConstructor constructor,
+            BindingTrace trace,
+            JetFile file,
+            @NotNull StatementFilter statementFilter
+    ) {
+        JetScope scope = resolveSession.getScopeProvider().getResolutionScopeForDeclaration(constructor);
+        ConstructorDescriptor constructorDescriptor = (ConstructorDescriptor) resolveSession.resolveToDescriptor(constructor);
+        ForceResolveUtil.forceResolveAllContents(constructorDescriptor);
+
+        BodyResolver bodyResolver = createBodyResolver(resolveSession, trace, file, statementFilter);
+        bodyResolver.resolveSecondaryConstructorBody(createEmptyContext(resolveSession), trace, constructor, constructorDescriptor, scope);
+    }
+
     private void constructorAdditionalResolve(
             ResolveSession resolveSession,
             JetClass klass,
@@ -456,8 +473,8 @@ public abstract class ElementResolver {
 
     private static TopDownAnalysisParameters createParameters(@NotNull ResolveSession resolveSession) {
         return TopDownAnalysisParameters.createForLocalDeclarations(
-                resolveSession.getStorageManager(), resolveSession.getExceptionTracker(),
-                Predicates.<PsiFile>alwaysTrue());
+                resolveSession.getStorageManager(), resolveSession.getExceptionTracker()
+        );
     }
 
     @NotNull
@@ -591,6 +608,11 @@ public abstract class ElementResolver {
         }
 
         @Override
+        public Map<JetSecondaryConstructor, ConstructorDescriptor> getSecondaryConstructors() {
+            return Collections.emptyMap();
+        }
+
+        @Override
         public Map<JetProperty, PropertyDescriptor> getProperties() {
             return Collections.emptyMap();
         }
@@ -620,11 +642,6 @@ public abstract class ElementResolver {
         @Override
         public TopDownAnalysisParameters getTopDownAnalysisParameters() {
             return topDownAnalysisParameters;
-        }
-
-        @Override
-        public boolean completeAnalysisNeeded(@NotNull PsiElement element) {
-            return true;
         }
     }
 }

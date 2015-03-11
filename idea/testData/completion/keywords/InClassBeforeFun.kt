@@ -30,5 +30,7 @@ public class Test {
 // EXIST:  val
 // EXIST:  var
 // EXIST:  vararg
+// EXIST:  constructor
+// EXIST:  init
 /*why?*/
-// NUMBER: 20
+// NUMBER: 23

@@ -107,16 +107,6 @@ public class JetClass extends JetTypeParameterListOwnerStub<KotlinClassStub> imp
         }
     }
 
-    public void removePrimaryConstructorModifier(@NotNull JetModifierKeywordToken modifier) {
-        JetModifierList list = getPrimaryConstructorModifierList();
-        if (list != null) {
-            PsiElement token = list.getModifier(modifier);
-            if (token != null) {
-                token.delete();
-            }
-        }
-    }
-
     @Override
     @NotNull
     public List<JetClassInitializer> getAnonymousInitializers() {
@@ -126,8 +116,7 @@ public class JetClass extends JetTypeParameterListOwnerStub<KotlinClassStub> imp
         return body.getAnonymousInitializers();
     }
 
-    @Override
-    public boolean hasPrimaryConstructor() {
+    private boolean hasExplicitPrimaryConstructor() {
         return getPrimaryConstructorParameterList() != null;
     }
 
@@ -139,13 +128,6 @@ public class JetClass extends JetTypeParameterListOwnerStub<KotlinClassStub> imp
     @Override
     public JetClassBody getBody() {
         return getStubOrPsiChild(JetStubElementTypes.CLASS_BODY);
-    }
-
-    @Nullable
-    public JetObjectDeclaration getDefaultObject() {
-        JetClassBody body = getBody();
-        if (body == null) return null;
-        return body.getDefaultObject();
     }
 
     public List<JetProperty> getProperties() {
@@ -235,5 +217,28 @@ public class JetClass extends JetTypeParameterListOwnerStub<KotlinClassStub> imp
             return stub.isLocal();
         }
         return JetPsiUtil.isLocal(this);
+    }
+
+    @NotNull
+    public List<JetObjectDeclaration> getDefaultObjects() {
+        JetClassBody body = getBody();
+        if (body == null) {
+            return Collections.emptyList();
+        }
+        return body.getAllDefaultObjects();
+    }
+
+    public boolean hasPrimaryConstructor() {
+        return hasExplicitPrimaryConstructor() || !hasSecondaryConstructors();
+    }
+
+    private boolean hasSecondaryConstructors() {
+        return !getSecondaryConstructors().isEmpty();
+    }
+
+    @NotNull
+    public List<JetSecondaryConstructor> getSecondaryConstructors() {
+        JetClassBody body = getBody();
+        return body != null ? body.getSecondaryConstructors() : Collections.<JetSecondaryConstructor>emptyList();
     }
 }

@@ -7,7 +7,7 @@ class Test<in I> {
 
     fun apply(<!UNUSED_PARAMETER!>i<!>: I) {}
 
-    {
+    init {
         foo()
         this.foo()
     }
@@ -27,7 +27,7 @@ class Test<in I> {
         t.apply(t.<!INVISIBLE_MEMBER(foo; private/*private to this*/; Test)!>foo<!>())
     }
 
-    class object {
+    default object {
         fun <I> test(t: Test<I>) {
             t.apply(t.<!INVISIBLE_MEMBER(foo; private/*private to this*/; Test)!>foo<!>())
         }

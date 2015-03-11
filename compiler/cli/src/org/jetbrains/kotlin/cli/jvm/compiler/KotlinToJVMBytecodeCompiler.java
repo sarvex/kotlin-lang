@@ -16,12 +16,10 @@
 
 package org.jetbrains.kotlin.cli.jvm.compiler;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.ArrayUtil;
 import kotlin.Function0;
 import kotlin.Function1;
@@ -224,11 +222,12 @@ public class KotlinToJVMBytecodeCompiler {
     }
 
     public static void compileAndExecuteScript(
+            @NotNull CompilerConfiguration configuration,
             @NotNull KotlinPaths paths,
             @NotNull JetCoreEnvironment environment,
             @NotNull List<String> scriptArgs
     ) {
-        Class<?> scriptClass = compileScript(paths, environment);
+        Class<?> scriptClass = compileScript(configuration, paths, environment);
         if (scriptClass == null) return;
 
         try {
@@ -243,7 +242,11 @@ public class KotlinToJVMBytecodeCompiler {
     }
 
     @Nullable
-    public static Class<?> compileScript(@NotNull KotlinPaths paths, @NotNull JetCoreEnvironment environment) {
+    public static Class<?> compileScript(
+            @NotNull CompilerConfiguration configuration,
+            @NotNull KotlinPaths paths,
+            @NotNull JetCoreEnvironment environment
+    ) {
         List<AnalyzerScriptParameter> scriptParameters = environment.getConfiguration().getList(JVMConfigurationKeys.SCRIPT_PARAMETERS);
         if (!scriptParameters.isEmpty()) {
             JetScriptDefinitionProvider.getInstance(environment.getProject()).addScriptDefinition(
@@ -257,11 +260,13 @@ public class KotlinToJVMBytecodeCompiler {
 
         GeneratedClassLoader classLoader;
         try {
+            List<URL> classPaths = Lists.newArrayList(paths.getRuntimePath().toURI().toURL());
+            for (File file : configuration.get(JVMConfigurationKeys.CLASSPATH_KEY, Collections.<File>emptyList())) {
+                classPaths.add(file.toURI().toURL());
+            }
             classLoader = new GeneratedClassLoader(state.getFactory(),
-                                                   new URLClassLoader(new URL[] {
-                                                           // TODO: add all classpath
-                                                           paths.getRuntimePath().toURI().toURL()
-                                                   }, AllModules.class.getClassLoader())
+                                                   new URLClassLoader(classPaths.toArray(new URL[classPaths.size()]),
+                                                                      AllModules.class.getClassLoader())
             );
 
             FqName nameForScript = ScriptNameUtil.classNameForScript(environment.getSourceFiles().get(0).getScript());
@@ -304,7 +309,6 @@ public class KotlinToJVMBytecodeCompiler {
                                 ContextPackage.GlobalContext(),
                                 environment.getSourceFiles(),
                                 sharedTrace,
-                                Predicates.<PsiFile>alwaysTrue(),
                                 analyzeModule,
                                 environment.getConfiguration().get(JVMConfigurationKeys.MODULE_IDS),
                                 environment.getConfiguration().get(JVMConfigurationKeys.INCREMENTAL_CACHE_PROVIDER)

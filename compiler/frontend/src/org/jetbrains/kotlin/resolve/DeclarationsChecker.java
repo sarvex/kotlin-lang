@@ -70,7 +70,6 @@ public class DeclarationsChecker {
         for (Map.Entry<JetClassOrObject, ClassDescriptorWithResolutionScopes> entry : classes.entrySet()) {
             JetClassOrObject classOrObject = entry.getKey();
             ClassDescriptorWithResolutionScopes classDescriptor = entry.getValue();
-            if (!bodiesResolveContext.completeAnalysisNeeded(classOrObject)) continue;
 
             checkSupertypesForConsistency(classDescriptor);
             checkTypesInClassHeader(classOrObject);
@@ -93,7 +92,6 @@ public class DeclarationsChecker {
             JetNamedFunction function = entry.getKey();
             SimpleFunctionDescriptor functionDescriptor = entry.getValue();
 
-            if (!bodiesResolveContext.completeAnalysisNeeded(function)) continue;
             checkFunction(function, functionDescriptor);
             modifiersChecker.checkModifiersForDeclaration(function, functionDescriptor);
         }
@@ -103,7 +101,6 @@ public class DeclarationsChecker {
             JetProperty property = entry.getKey();
             PropertyDescriptor propertyDescriptor = entry.getValue();
 
-            if (!bodiesResolveContext.completeAnalysisNeeded(property)) continue;
             checkProperty(property, propertyDescriptor);
             modifiersChecker.checkModifiersForDeclaration(property, propertyDescriptor);
         }
@@ -259,18 +256,24 @@ public class DeclarationsChecker {
     }
 
     private void checkObject(JetObjectDeclaration declaration, ClassDescriptor classDescriptor) {
+        checkDeprecatedClassObjectSyntax(declaration);
         reportErrorIfHasIllegalModifier(declaration);
         if  (declaration.isLocal() && !declaration.isDefault() && !declaration.isObjectLiteral()) {
             trace.report(LOCAL_OBJECT_NOT_ALLOWED.on(declaration, classDescriptor));
         }
     }
 
+    private void checkDeprecatedClassObjectSyntax(@NotNull JetObjectDeclaration declaration) {
+        if (declaration.getClassKeyword() != null) {
+            trace.report(DEPRECATED_CLASS_OBJECT_SYNTAX.on(declaration));
+        }
+    }
+
     private void checkClass(BodiesResolveContext c, JetClass aClass, ClassDescriptorWithResolutionScopes classDescriptor) {
         checkOpenMembers(classDescriptor);
         checkConstructorParameters(aClass);
-        if (c.getTopDownAnalysisParameters().isLazy()) {
-            checkTypeParameters(aClass);
-        }
+        checkTypeParameters(aClass);
+
         if (aClass.isTrait()) {
             checkTraitModifiers(aClass);
             checkConstructorInTrait(aClass);
@@ -366,7 +369,7 @@ public class DeclarationsChecker {
             checkPropertyAbstractness(property, propertyDescriptor, (ClassDescriptor) containingDeclaration);
         }
         else {
-            modifiersChecker.checkIllegalModalityModifiers(property);
+            modifiersChecker.reportIllegalModalityModifiers(property);
         }
         checkPropertyInitializer(property, propertyDescriptor);
         checkAccessors(property, propertyDescriptor);
@@ -453,7 +456,7 @@ public class DeclarationsChecker {
         if (initializer == null && delegate == null) {
             boolean error = false;
             if (backingFieldRequired && !inTrait &&
-                Boolean.FALSE.equals(trace.getBindingContext().get(BindingContext.IS_INITIALIZED, propertyDescriptor))) {
+                Boolean.TRUE.equals(trace.getBindingContext().get(BindingContext.IS_UNINITIALIZED, propertyDescriptor))) {
                 if (!(containingDeclaration instanceof ClassDescriptor) || hasAccessorImplementation) {
                     error = true;
                     trace.report(MUST_BE_INITIALIZED.on(property));
@@ -516,7 +519,7 @@ public class DeclarationsChecker {
             }
             return;
         }
-        modifiersChecker.checkIllegalModalityModifiers(function);
+        modifiersChecker.reportIllegalModalityModifiers(function);
         if (!function.hasBody() && !hasAbstractModifier) {
             trace.report(NON_MEMBER_FUNCTION_NO_BODY.on(function, functionDescriptor));
         }
@@ -527,7 +530,7 @@ public class DeclarationsChecker {
             PropertyAccessorDescriptor propertyAccessorDescriptor = accessor.isGetter() ? propertyDescriptor.getGetter() : propertyDescriptor.getSetter();
             assert propertyAccessorDescriptor != null : "No property accessor descriptor for " + property.getText();
             modifiersChecker.checkModifiersForDeclaration(accessor, propertyAccessorDescriptor);
-            modifiersChecker.checkIllegalModalityModifiers(accessor);
+            modifiersChecker.reportIllegalModalityModifiers(accessor);
         }
         JetPropertyAccessor getter = property.getGetter();
         PropertyGetterDescriptor getterDescriptor = propertyDescriptor.getGetter();
@@ -565,8 +568,7 @@ public class DeclarationsChecker {
 
         List<JetDelegationSpecifier> delegationSpecifiers = enumEntry.getDelegationSpecifiers();
         ConstructorDescriptor constructor = enumClass.getUnsubstitutedPrimaryConstructor();
-        assert constructor != null;
-        if (!constructor.getValueParameters().isEmpty() && delegationSpecifiers.isEmpty()) {
+        if ((constructor == null || !constructor.getValueParameters().isEmpty()) && delegationSpecifiers.isEmpty()) {
             trace.report(ENUM_ENTRY_SHOULD_BE_INITIALIZED.on(enumEntry, enumClass));
         }
 

@@ -56,6 +56,7 @@ import org.jetbrains.kotlin.types.TypeUtils;
 
 import java.util.*;
 
+import static kotlin.KotlinPackage.firstOrNull;
 import static org.jetbrains.kotlin.diagnostics.Errors.*;
 import static org.jetbrains.kotlin.resolve.BindingContext.TYPE;
 import static org.jetbrains.kotlin.resolve.ModifiersChecker.*;
@@ -91,6 +92,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     private final NotNullLazyValue<JetScope> scopeForClassHeaderResolution;
     private final NotNullLazyValue<JetScope> scopeForMemberDeclarationResolution;
     private final NotNullLazyValue<JetScope> scopeForPropertyInitializerResolution;
+    private final NotNullLazyValue<JetScope> scopeForSecondaryConstructorHeaderResolution;
 
     private final NullableLazyValue<Void> forceResolveAllContents;
     private final boolean isDefaultObject;
@@ -210,6 +212,12 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
                 return computeScopeForPropertyInitializerResolution();
             }
         });
+        this.scopeForSecondaryConstructorHeaderResolution = storageManager.createLazyValue(new Function0<JetScope>() {
+            @Override
+            public JetScope invoke() {
+                return computeScopeForSecondaryConstructorHeaderResolution();
+            }
+        });
         this.forceResolveAllContents = storageManager.createRecursionTolerantNullableLazyValue(new Function0<Void>() {
             @Override
             public Void invoke() {
@@ -327,6 +335,23 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
 
     @NotNull
     @Override
+    public JetScope getScopeForSecondaryConstructorHeaderResolution() {
+        return scopeForSecondaryConstructorHeaderResolution.invoke();
+    }
+
+
+    @NotNull
+    private JetScope computeScopeForSecondaryConstructorHeaderResolution() {
+        return new ChainedScope(
+                this,
+                "ScopeForSecondaryConstructorHeaderResolution: " + getName(),
+                getScopeForClassHeaderResolution(),
+                getStaticScope()
+        );
+    }
+
+    @NotNull
+    @Override
     public JetScope getStaticScope() {
         return staticScope;
     }
@@ -411,7 +436,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
 
     @Nullable
     private JetObjectDeclaration getDefaultObjectIfAllowed() {
-        JetObjectDeclaration defaultObject = declarationProvider.getOwnerInfo().getDefaultObject();
+        JetObjectDeclaration defaultObject = firstOrNull(declarationProvider.getOwnerInfo().getDefaultObjects());
         return (defaultObject != null && isDefaultObjectAllowed()) ? defaultObject : null;
     }
 

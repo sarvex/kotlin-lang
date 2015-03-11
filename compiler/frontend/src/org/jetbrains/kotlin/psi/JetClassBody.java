@@ -62,13 +62,13 @@ public class JetClassBody extends JetElementImplStub<KotlinPlaceHolderStub<JetCl
     }
 
     @NotNull
-    public List<JetProperty> getProperties() {
-        return getStubOrPsiChildrenAsList(JetStubElementTypes.PROPERTY);
+    /* package-protected */ List<JetSecondaryConstructor> getSecondaryConstructors() {
+        return getStubOrPsiChildrenAsList(JetStubElementTypes.SECONDARY_CONSTRUCTOR);
     }
 
-    @Nullable
-    public JetObjectDeclaration getDefaultObject() {
-        return firstOrNull(getAllDefaultObjects());
+    @NotNull
+    public List<JetProperty> getProperties() {
+        return getStubOrPsiChildrenAsList(JetStubElementTypes.PROPERTY);
     }
 
     @NotNull

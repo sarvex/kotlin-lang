@@ -1,10 +1,10 @@
 class A {
-    enum class <!REDECLARATION!>E<!> {
+    enum class E {
         ENTRY
     }
     
-    class object {
-        enum class <!REDECLARATION!>E<!> {
+    default object {
+        enum class E {
             ENTRY2
         }
     }

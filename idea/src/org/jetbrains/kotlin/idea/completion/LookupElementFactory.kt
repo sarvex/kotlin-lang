@@ -109,9 +109,8 @@ public class LookupElementFactory(
             element = element.appendTailText(typeParams.map { it.getName() }.joinToString(", ", "<", ">"), true)
         }
 
-        val qualifiedName = psiClass.getQualifiedName()
-        val dotIndex = qualifiedName.lastIndexOf('.')
-        val packageName = if (dotIndex <= 0) "<root>" else qualifiedName.substring(0, dotIndex)
+        val qualifiedName = psiClass.getQualifiedName()!!
+        val packageName = qualifiedName.substringBeforeLast('.', "<root>")
         element = element.appendTailText(" ($packageName)", true)
 
         if (psiClass.isDeprecated()) {
@@ -256,7 +255,7 @@ public class LookupElementFactory(
         }
     }
 
-    class object {
+    default object {
         public fun getDefaultInsertHandler(descriptor: DeclarationDescriptor): InsertHandler<LookupElement> {
             return when (descriptor) {
                 is FunctionDescriptor -> {

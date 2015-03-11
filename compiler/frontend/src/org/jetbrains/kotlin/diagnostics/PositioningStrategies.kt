@@ -26,11 +26,14 @@ import org.jetbrains.kotlin.lexer.JetKeywordToken
 import org.jetbrains.kotlin.lexer.JetTokens
 import org.jetbrains.kotlin.utils.sure
 import kotlin.platform.platformStatic
+import org.jetbrains.kotlin.psi.psiUtil.*
 
 public object PositioningStrategies {
     private open class DeclarationHeader<T : JetDeclaration> : PositioningStrategy<T>() {
         override fun isValid(element: T): Boolean {
-            if (element is JetNamedDeclaration && element !is JetObjectDeclaration) {
+            if (element is JetNamedDeclaration &&
+                (element !is JetObjectDeclaration && element !is JetSecondaryConstructor)
+            ) {
                 if (element.getNameIdentifier() == null) {
                     return false
                 }
@@ -135,6 +138,9 @@ public object PositioningStrategies {
                 }
                 is JetObjectDeclaration -> {
                     return DECLARATION_NAME.mark(element)
+                }
+                is JetSecondaryConstructor -> {
+                    return markRange(element.getConstructorKeyword(), element.getValueParameterList() ?: element.getConstructorKeyword())
                 }
             }
             return super.mark(element)
@@ -364,4 +370,37 @@ public object PositioningStrategies {
             return markRange(element.getOperationReference(), element)
         }
     }
+
+    public val DEFAULT_OBJECT: PositioningStrategy<JetObjectDeclaration> = object : PositioningStrategy<JetObjectDeclaration>() {
+        override fun mark(element: JetObjectDeclaration): List<TextRange> {
+            if (element.hasModifier(JetTokens.DEFAULT_KEYWORD)) {
+                return modifierSetPosition(JetTokens.DEFAULT_KEYWORD).mark(element)
+            }
+            return DEFAULT.mark(element)
+        }
+    }
+
+    public val SECONDARY_CONSTRUCTOR_DELEGATION_CALL: PositioningStrategy<JetConstructorDelegationCall> =
+            object : PositioningStrategy<JetConstructorDelegationCall>() {
+                override fun mark(element: JetConstructorDelegationCall): List<TextRange> {
+                    if (element.getCalleeExpression()?.isEmpty() ?: false) {
+                        val constructor = element.getStrictParentOfType<JetSecondaryConstructor>()!!
+                        return markElement(constructor.getConstructorKeyword())
+                    }
+                    return markElement(element.getCalleeExpression() ?: element)
+                }
+            }
+
+    public val SECONDARY_CONSTRUCTOR_DELEGATION_CALL_OR_DEFAULT: PositioningStrategy<PsiElement> =
+            object : PositioningStrategy<PsiElement>() {
+                override fun mark(element: PsiElement): List<TextRange> {
+                    val parent = element.getParent()
+                    if (parent is JetConstructorDelegationCall) {
+                        return SECONDARY_CONSTRUCTOR_DELEGATION_CALL.mark(parent)
+                    }
+                    else {
+                        return DEFAULT.mark(element)
+                    }
+                }
+            }
 }

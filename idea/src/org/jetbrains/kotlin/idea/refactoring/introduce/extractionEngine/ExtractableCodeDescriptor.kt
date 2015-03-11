@@ -16,33 +16,30 @@
 
 package org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine
 
-import org.jetbrains.kotlin.types.JetType
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import com.intellij.util.containers.MultiMap
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.references.JetSimpleNameReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.idea.references.JetSimpleNameReference.ShorteningMode
-import org.jetbrains.kotlin.psi.psiUtil.replaced
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine.AnalysisResult.Status
 import org.jetbrains.kotlin.idea.refactoring.JetRefactoringBundle
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine.AnalysisResult.ErrorMessage
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import com.intellij.openapi.util.text.StringUtil
-import org.jetbrains.kotlin.types.CommonSupertypes
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine.OutputValue.*
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.types.TypeUtils
 import kotlin.properties.Delegates
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.kotlin.psi.psiUtil.getQualifiedElementSelector
 import org.jetbrains.kotlin.idea.util.psi.patternMatching.JetPsiRange
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.idea.util.isUnit
 import org.jetbrains.kotlin.resolve.descriptorUtil.resolveTopLevelClass
 import org.jetbrains.kotlin.psi.*
 import java.util.*
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.psi.psiUtil.*
 
 trait Parameter {
     val argumentText: String
@@ -186,7 +183,7 @@ abstract class OutputValueBoxer(val outputValues: List<OutputValue>) {
             assert(outputValues.size() <= 3, "At most 3 output values are supported")
         }
 
-        class object {
+        default object {
             private val selectors = array("first", "second", "third")
         }
 
@@ -310,7 +307,10 @@ enum class ExtractionTarget(val name: String) {
 
     PROPERTY_WITH_INITIALIZER : ExtractionTarget("property with initializer") {
         override fun isAvailable(descriptor: ExtractableCodeDescriptor): Boolean {
-            return checkSignatureAndParent(descriptor) && checkSimpleControlFlow(descriptor) && checkSimpleBody(descriptor)
+            return checkSignatureAndParent(descriptor)
+                   && checkSimpleControlFlow(descriptor)
+                   && checkSimpleBody(descriptor)
+                   && checkNotTrait(descriptor)
         }
     }
 
@@ -322,13 +322,20 @@ enum class ExtractionTarget(val name: String) {
 
     LAZY_PROPERTY : ExtractionTarget("lazy property") {
         override fun isAvailable(descriptor: ExtractableCodeDescriptor): Boolean {
-            return checkSignatureAndParent(descriptor) && checkSimpleControlFlow(descriptor)
+            return checkSignatureAndParent(descriptor)
+                   && checkSimpleControlFlow(descriptor)
+                   && checkNotTrait(descriptor)
         }
     }
 
     abstract fun isAvailable(descriptor: ExtractableCodeDescriptor): Boolean
 
-    class object {
+    default object {
+        fun checkNotTrait(descriptor: ExtractableCodeDescriptor): Boolean {
+            val parent = descriptor.extractionData.targetSibling.getStrictParentOfType<JetDeclaration>()
+            return !(parent is JetClass && parent.isTrait())
+        }
+
         fun checkSimpleBody(descriptor: ExtractableCodeDescriptor): Boolean {
             val expression = descriptor.extractionData.getExpressions().singleOrNull()
             return expression != null && expression !is JetDeclaration && expression !is JetBlockExpression
@@ -358,7 +365,7 @@ data class ExtractionGeneratorOptions(
         val target: ExtractionTarget = ExtractionTarget.FUNCTION,
         val flexibleTypesAllowed: Boolean = false
 ) {
-    class object {
+    default object {
         val DEFAULT = ExtractionGeneratorOptions()
     }
 }

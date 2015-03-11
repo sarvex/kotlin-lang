@@ -69,7 +69,7 @@ object DocCommentConverter {
 
     private fun convertInlineDocTag(tag: PsiInlineDocTag) = when(tag.getName()) {
         "code", "literal" -> {
-            val text = tag.getDataElements().map { it.getText() }.join()
+            val text = tag.getDataElements().map { it.getText() }.join("")
             val escaped = StringUtil.escapeXml(text.trimLeading())
             if (tag.getName() == "code") "<code>$escaped</code>" else escaped
         }
@@ -94,7 +94,7 @@ object DocCommentConverter {
     private class HtmlToMarkdownConverter() : XmlRecursiveElementVisitor() {
         private enum class ListType { Ordered; Unordered }
         data class MarkdownSpan(val prefix: String, val suffix: String) {
-            class object {
+            default object {
                 val Empty = MarkdownSpan("", "")
 
                 fun wrap(text: String) = MarkdownSpan(text, text)
