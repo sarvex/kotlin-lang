@@ -40,9 +40,9 @@ public class BuiltInsSerializerTest : TestCaseWithTmpdir() {
 
         val module = JetTestUtils.createEmptyModule("<module>")
 
-        val packageFragment = BuiltinsPackageFragment(TEST_PACKAGE_FQNAME, LockBasedStorageManager(), module, FlexibleTypeCapabilitiesDeserializer.ThrowException) {
-            path ->
-            val file = File(tmpdir, path)
+        val packageFragment = BuiltinsPackageFragment(TEST_PACKAGE_FQNAME, LockBasedStorageManager(), module,
+                                                      FlexibleTypeCapabilitiesDeserializer.ThrowException) {
+            val file = File(tmpdir,it)
             if (file.exists()) FileInputStream(file) else null
         }
 

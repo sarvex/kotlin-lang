@@ -110,7 +110,8 @@ public class KotlinBuiltIns {
                 Name.special("<built-ins lazy module>"), Collections.<ImportPath>emptyList(), PlatformToKotlinClassMap.EMPTY
         );
         builtinsPackageFragment = new BuiltinsPackageFragment(
-                BUILT_INS_PACKAGE_FQ_NAME, new LockBasedStorageManager(), builtInsModule, FlexibleTypeCapabilitiesDeserializer.ThrowException.INSTANCE$,
+                BUILT_INS_PACKAGE_FQ_NAME, new LockBasedStorageManager(), builtInsModule,
+                FlexibleTypeCapabilitiesDeserializer.ThrowException.INSTANCE$,
                 new Function1<String, InputStream>() {
                     @Override
                     public InputStream invoke(String path) {
