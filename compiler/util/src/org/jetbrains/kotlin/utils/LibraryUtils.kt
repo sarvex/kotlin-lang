@@ -85,8 +85,11 @@ public object LibraryUtils {
             checkAttributeValue(library, TITLE_KOTLIN_JAVASCRIPT_LIB, Attributes.Name.SPECIFICATION_TITLE) && getKotlinJsModuleName(library) != null
 
     platformStatic
+    public fun isKotlinJavascriptLibraryWithMetadata(library: File): Boolean = KotlinJavascriptMetadataUtils.loadMetadata(library).isNotEmpty()
+
+    platformStatic
     public fun isKotlinJavascriptLibrary(library: File): Boolean =
-            isOldKotlinJavascriptLibrary(library) || KotlinJavascriptMetadataUtils.loadMetadata(library).isNotEmpty()
+            isOldKotlinJavascriptLibrary(library) || isKotlinJavascriptLibraryWithMetadata(library)
 
     platformStatic
     public fun isKotlinJavascriptStdLibrary(library: File): Boolean {
