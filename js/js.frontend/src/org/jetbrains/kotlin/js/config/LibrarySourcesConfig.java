@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.utils.LibraryUtils;
 import java.io.File;
 import java.util.List;
 
-import static org.jetbrains.kotlin.utils.LibraryUtils.isKotlinJavascriptLibrary;
+import static org.jetbrains.kotlin.utils.LibraryUtils.*;
 
 public class LibrarySourcesConfig extends Config {
     @NotNull
@@ -72,13 +72,8 @@ public class LibrarySourcesConfig extends Config {
         return files;
     }
 
-    @NotNull
-    public List<String> getJsFiles() {
-        return LibraryUtils.readJsFiles(files);
-    }
-
     @Override
-    protected void load(@NotNull final List<JetFile> sourceFilesInLibraries, @NotNull final List<KotlinJavascriptMetadata> metadata) {
+    protected void init(@NotNull final List<JetFile> sourceFilesInLibraries, @NotNull final List<KotlinJavascriptMetadata> metadata) {
         if (files.isEmpty()) return;
 
         final PsiManager psiManager = PsiManager.getInstance(getProject());
@@ -128,7 +123,6 @@ public class LibrarySourcesConfig extends Config {
 
         for (String path : files) {
             VirtualFile file;
-            String actualModuleName = moduleName;
             if (path.charAt(0) == '@') {
                 moduleName = path.substring(1);
                 continue;
@@ -152,13 +146,22 @@ public class LibrarySourcesConfig extends Config {
                 return true;
             }
             else {
-                if (isKotlinJavascriptLibrary(filePath)) {
+                String actualModuleName;
+
+                if (moduleName != null) {
+                    actualModuleName = moduleName;
+                }
+                else if (isOldKotlinJavascriptLibrary(filePath)) {
                     actualModuleName = LibraryUtils.getKotlinJsModuleName(filePath);
                 }
-                else if (actualModuleName == null) {
+                else if (isKotlinJavascriptLibraryWithMetadata(filePath)) {
+                    actualModuleName = null;
+                }
+                else {
                     report.invoke("'" + path + "' is not a valid Kotlin Javascript library");
                     return true;
                 }
+
                 if (action != null) {
                     action.invoke(actualModuleName, file);
                 }

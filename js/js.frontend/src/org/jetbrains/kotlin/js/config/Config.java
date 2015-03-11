@@ -31,10 +31,8 @@ import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS;
 import org.jetbrains.kotlin.psi.JetFile;
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil;
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadata;
-import org.jetbrains.kotlin.utils.PathUtil;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +44,7 @@ public abstract class Config {
     @NotNull
     private final Project project;
     @NotNull
-    private final List<JetFile> sourceFilesInLibraries = new SmartList<JetFile>();
+    private final List<JetFile> sourceFilesFromLibraries = new SmartList<JetFile>();
     @NotNull
     private final EcmaVersion target;
 
@@ -61,7 +59,7 @@ public abstract class Config {
     @Nullable
     private List<ModuleDescriptorImpl> moduleDescriptors = null;
 
-    private boolean loaded = false;
+    private boolean initialized = false;
 
     public Config(
             @NotNull Project project,
@@ -102,25 +100,25 @@ public abstract class Config {
 
     public abstract  boolean checkLibFilesAndReportErrors(@NotNull Function1<String, Unit> report);
 
-    protected abstract void load(@NotNull List<JetFile> sourceFilesInLibraries, @NotNull List<KotlinJavascriptMetadata> metadata);
+    protected abstract void init(@NotNull List<JetFile> sourceFilesInLibraries, @NotNull List<KotlinJavascriptMetadata> metadata);
 
     @NotNull
     public List<ModuleDescriptorImpl> getModuleDescriptors() {
-        loadIfNeeded();
+        init();
         if (moduleDescriptors != null) return moduleDescriptors;
 
         moduleDescriptors = new SmartList<ModuleDescriptorImpl>();
         for(KotlinJavascriptMetadata metadataEntry : metadata) {
-            moduleDescriptors.add(loadModuleDescriptor(metadataEntry));
+            moduleDescriptors.add(createModuleDescriptor(metadataEntry));
         }
 
         return moduleDescriptors;
     }
 
     @NotNull
-    public List<JetFile> getSourceFilesInLibraries() {
-        loadIfNeeded();
-        return sourceFilesInLibraries;
+    public List<JetFile> getSourceFilesFromLibraries() {
+        init();
+        return sourceFilesFromLibraries;
     }
 
 
@@ -128,14 +126,14 @@ public abstract class Config {
         return false;
     }
 
-    private void loadIfNeeded() {
-        if (loaded) return;
+    private void init() {
+        if (initialized) return;
 
-        load(sourceFilesInLibraries, metadata);
-        loaded = true;
+        init(sourceFilesFromLibraries, metadata);
+        initialized = true;
     }
 
-    private static ModuleDescriptorImpl loadModuleDescriptor(KotlinJavascriptMetadata metadata) {
+    private static ModuleDescriptorImpl createModuleDescriptor(KotlinJavascriptMetadata metadata) {
         ModuleDescriptorImpl moduleDescriptor = TopDownAnalyzerFacadeForJS.createJsModule("<" + metadata.getModuleName() + ">");
 
         List<PackageFragmentProvider> providers = KotlinJavascriptSerializationUtil
@@ -154,7 +152,7 @@ public abstract class Config {
     public static Collection<JetFile> withJsLibAdded(@NotNull Collection<JetFile> files, @NotNull Config config) {
         Collection<JetFile> allFiles = Lists.newArrayList();
         allFiles.addAll(files);
-        allFiles.addAll(config.getSourceFilesInLibraries());
+        allFiles.addAll(config.getSourceFilesFromLibraries());
         return allFiles;
     }
 }

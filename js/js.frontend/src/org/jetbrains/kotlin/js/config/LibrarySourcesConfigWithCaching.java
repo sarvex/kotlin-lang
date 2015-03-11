@@ -21,7 +21,6 @@ import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.psi.JetFile;
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadata;
-import org.jetbrains.kotlin.utils.LibraryUtils;
 import org.jetbrains.kotlin.utils.PathUtil;
 
 import java.util.Collections;
@@ -32,7 +31,6 @@ public class LibrarySourcesConfigWithCaching extends LibrarySourcesConfig {
             Collections.singletonList(PathUtil.getKotlinPathsForDistDirectory().getJsStdLibJarPath().getAbsolutePath());
 
     private static List<KotlinJavascriptMetadata> stdlibMetadata = null;
-    private static List<String> stdlibJsFiles = null;
 
     private final boolean isUnitTestConfig;
 
@@ -44,38 +42,20 @@ public class LibrarySourcesConfigWithCaching extends LibrarySourcesConfig {
             boolean inlineEnabled,
             boolean isUnitTestConfig
     ) {
-        super(project, moduleId, stdlibMetadata == null ? JS_STDLIB : Collections.<String>emptyList(), ecmaVersion, sourcemap, inlineEnabled);
+        super(project, moduleId, JS_STDLIB, ecmaVersion, sourcemap, inlineEnabled);
         this.isUnitTestConfig = isUnitTestConfig;
     }
 
     @Override
-    protected  void load(@NotNull List<JetFile> sourceFilesInLibraries, @NotNull List<KotlinJavascriptMetadata> metadata) {
+    protected  void init(@NotNull List<JetFile> sourceFilesInLibraries, @NotNull List<KotlinJavascriptMetadata> metadata) {
         if (stdlibMetadata == null) {
             //noinspection AssignmentToStaticFieldFromInstanceMethod
             stdlibMetadata = new SmartList<KotlinJavascriptMetadata>();
-            super.load(sourceFilesInLibraries, stdlibMetadata);
+            super.init(sourceFilesInLibraries, stdlibMetadata);
         }
 
         metadata.addAll(stdlibMetadata);
     }
-
-    @Override
-    @NotNull
-    public List<String> getLibraries() {
-        return JS_STDLIB;
-    }
-
-    @Override
-    @NotNull
-    public List<String> getJsFiles() {
-        if (stdlibJsFiles == null) {
-            //noinspection AssignmentToStaticFieldFromInstanceMethod
-            stdlibJsFiles = LibraryUtils.readJsFiles(JS_STDLIB);
-        }
-
-        return stdlibJsFiles;
-    }
-
 
     @Override
     public boolean isTestConfig() {
