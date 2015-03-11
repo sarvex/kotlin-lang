@@ -18,24 +18,74 @@ package org.jetbrains.kotlin.idea.decompiler.navigation
 
 import com.intellij.ide.highlighter.JavaClassFileType
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootModificationTracker
+import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.testFramework.BinaryLightVirtualFile
-import kotlin.platform.platformStatic
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.idea.caches.resolve.LIBRARY_NAME_PREFIX
+import org.jetbrains.kotlin.idea.project.ProjectStructureUtil
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import kotlin.platform.platformStatic
 
-import java.io.IOException
+fun getKotlinJavascriptLibrary(descriptor: DeclarationDescriptor, project: Project): Library? {
+    val containingPackageFragment = DescriptorUtils.getParentOfType<PackageFragmentDescriptor>(descriptor, javaClass<PackageFragmentDescriptor>())
+    if (containingPackageFragment == null) return null
+
+    val module = DescriptorUtils.getContainingModule(descriptor)
+    assert(module is ModuleDescriptorImpl)
+
+    var moduleName = getModuleName(module)
+
+    return getKotlinJavascriptLibrary(moduleName, project)
+}
+
+fun getKotlinJavascriptLibrary(libraryName: String, project: Project): Library? {
+    var library: Library? = null
+    val jsModules = ModuleManager.getInstance(project).getModules().filter { (ProjectStructureUtil.isJsKotlinModule(it)) }
+    jsModules.forEach { module ->
+        ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary {
+            if (it.getName() == libraryName) { library = it; false } else true
+        }
+    }
+
+    return library
+}
+
+fun getKotlinJavascriptLibrary(file: VirtualFile, project: Project): Library? {
+    val module = file.getUserData(JsMetaFileVirtualFileHolder.MODULE_DESCRIPTOR_KEY)
+    if (module == null) return null
+
+    var moduleName = getModuleName(module)
+
+    return getKotlinJavascriptLibrary(moduleName, project)
+}
+
+private fun getModuleName(module: ModuleDescriptor): String {
+    var moduleName = module.getName().asString()
+    moduleName = moduleName.substring(1, moduleName.length() - 1)
+    if (moduleName.startsWith(LIBRARY_NAME_PREFIX)) {
+        moduleName = moduleName.substring(LIBRARY_NAME_PREFIX.length())
+    }
+
+    return moduleName
+}
+
 
 class JsMetaFileVirtualFileHolder private(val myProject: Project) {
-    class object {
-        public val MODULE_DESCRIPTOR_KEY: Key<ModuleDescriptorImpl> = Key.create<ModuleDescriptorImpl>("MODULE_DESCRIPTOR")
+    default object {
+        public val MODULE_DESCRIPTOR_KEY: Key<ModuleDescriptorImpl> = Key.create("MODULE_DESCRIPTOR")
+        public val PACKAGE_FQNAME_KEY: Key<FqName> = Key.create("PACKAGE_FQNAME_KEY")
         private val JS_META_FILE_HOLDER_KEY: Key<JsMetaFileVirtualFileHolder> = Key.create("JS_META_FILE_HOLDER_KEY")
 
         platformStatic
@@ -51,10 +101,9 @@ class JsMetaFileVirtualFileHolder private(val myProject: Project) {
         }
     }
 
-    private val cachedFileMap = CachedValuesManager.getManager(myProject).createCachedValue(
-            {
-                CachedValueProvider.Result(hashMapOf<String, VirtualFile>(), ProjectRootModificationTracker.getInstance(myProject))
-            }, false)
+    private val cachedFileMap = CachedValuesManager.getManager(myProject).createCachedValue( {
+        CachedValueProvider.Result(hashMapOf<String, VirtualFile>(), ProjectRootModificationTracker.getInstance(myProject))
+    }, false)
 
     fun getFile(descriptor: DeclarationDescriptor): VirtualFile? {
         val containingPackageFragment = DescriptorUtils.getParentOfType<PackageFragmentDescriptor>(descriptor, javaClass<PackageFragmentDescriptor>())
@@ -82,6 +131,7 @@ class JsMetaFileVirtualFileHolder private(val myProject: Project) {
         }
 
         result?.putUserData(MODULE_DESCRIPTOR_KEY, module as ModuleDescriptorImpl)
+        result?.putUserData(PACKAGE_FQNAME_KEY, FqName(packageName))
 
         return result
     }
