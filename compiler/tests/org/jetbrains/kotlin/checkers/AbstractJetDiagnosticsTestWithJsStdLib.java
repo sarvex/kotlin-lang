@@ -27,24 +27,20 @@ import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl;
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS;
 import org.jetbrains.kotlin.js.config.EcmaVersion;
 import org.jetbrains.kotlin.js.config.LibrarySourcesConfig;
+import org.jetbrains.kotlin.js.config.LibrarySourcesConfigWithCaching;
 import org.jetbrains.kotlin.psi.JetFile;
 import org.jetbrains.kotlin.resolve.BindingTrace;
-import org.jetbrains.kotlin.utils.PathUtil;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractJetDiagnosticsTestWithJsStdLib extends AbstractJetDiagnosticsTest {
-    public static final List<String> JS_STDLIB =
-            Collections.singletonList(PathUtil.getKotlinPathsForDistDirectory().getJsStdLibJarPath().getAbsolutePath());
-
     private LibrarySourcesConfig config;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        config = new LibrarySourcesConfig(getProject(), "module", JS_STDLIB, EcmaVersion.defaultVersion(), false, true);
+        config = new LibrarySourcesConfigWithCaching(getProject(), "module", EcmaVersion.defaultVersion(), false, true, false);
     }
 
     @Override
