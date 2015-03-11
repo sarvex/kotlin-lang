@@ -31,57 +31,57 @@ public final class DebugJsProtoBuf {
   public static void registerAllExtensions(
       ExtensionRegistry registry) {
   }
-  public interface FilesOrBuilder
+  public interface LibraryOrBuilder
       extends MessageOrBuilder {
 
-    // repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;
+    // repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry>
+    List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry>
         getEntryList();
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry getEntry(int index);
+    org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry getEntry(int index);
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
     int getEntryCount();
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder>
+    List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder>
         getEntryOrBuilderList();
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder getEntryOrBuilder(
+    org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder getEntryOrBuilder(
         int index);
   }
   /**
-   * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Files}
+   * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Library}
    *
    * <pre>
-   * For Kotlin/Javascript we reuse builtins serialization code, in which there are files for each package (see BuiltinsSerializationUtil)
+   * For Kotlin/Javascript we reuse builtins serialization code.
    * </pre>
    */
-  public static final class Files extends
+  public static final class Library extends
       GeneratedMessage
-      implements FilesOrBuilder {
-    // Use Files.newBuilder() to construct.
-    private Files(GeneratedMessage.Builder<?> builder) {
+      implements LibraryOrBuilder {
+    // Use Library.newBuilder() to construct.
+    private Library(GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private Files(boolean noInit) { this.unknownFields = UnknownFieldSet.getDefaultInstance(); }
+    private Library(boolean noInit) { this.unknownFields = UnknownFieldSet.getDefaultInstance(); }
 
-    private static final Files defaultInstance;
-    public static Files getDefaultInstance() {
+    private static final Library defaultInstance;
+    public static Library getDefaultInstance() {
       return defaultInstance;
     }
 
-    public Files getDefaultInstanceForType() {
+    public Library getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -91,7 +91,7 @@ public final class DebugJsProtoBuf {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private Files(
+    private Library(
         CodedInputStream input,
         ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException {
@@ -116,10 +116,10 @@ public final class DebugJsProtoBuf {
             }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                entry_ = new ArrayList<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry>();
+                entry_ = new ArrayList<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              entry_.add(input.readMessage(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.PARSER, extensionRegistry));
+              entry_.add(input.readMessage(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.PARSER, extensionRegistry));
               break;
             }
           }
@@ -139,48 +139,48 @@ public final class DebugJsProtoBuf {
     }
     public static final Descriptors.Descriptor
         getDescriptor() {
-      return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor;
+      return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor;
     }
 
     protected GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_fieldAccessorTable
+      return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.Builder.class);
+              org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.Builder.class);
     }
 
-    public static Parser<Files> PARSER =
-        new AbstractParser<Files>() {
-      public Files parsePartialFrom(
+    public static Parser<Library> PARSER =
+        new AbstractParser<Library>() {
+      public Library parsePartialFrom(
           CodedInputStream input,
           ExtensionRegistryLite extensionRegistry)
           throws InvalidProtocolBufferException {
-        return new Files(input, extensionRegistry);
+        return new Library(input, extensionRegistry);
       }
     };
 
     @Override
-    public Parser<Files> getParserForType() {
+    public Parser<Library> getParserForType() {
       return PARSER;
     }
 
     public interface FileEntryOrBuilder
         extends MessageOrBuilder {
 
-      // required string name = 1;
+      // required string path = 1;
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
-      boolean hasName();
+      boolean hasPath();
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
-      String getName();
+      String getPath();
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
       ByteString
-          getNameBytes();
+          getPathBytes();
 
       // required bytes content = 2;
       /**
@@ -193,7 +193,7 @@ public final class DebugJsProtoBuf {
       ByteString getContent();
     }
     /**
-     * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Files.FileEntry}
+     * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Library.FileEntry}
      */
     public static final class FileEntry extends
         GeneratedMessage
@@ -245,7 +245,7 @@ public final class DebugJsProtoBuf {
               }
               case 10: {
                 bitField0_ |= 0x00000001;
-                name_ = input.readBytes();
+                path_ = input.readBytes();
                 break;
               }
               case 18: {
@@ -267,14 +267,14 @@ public final class DebugJsProtoBuf {
       }
       public static final Descriptors.Descriptor
           getDescriptor() {
-        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor;
+        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor;
       }
 
       protected GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_fieldAccessorTable
+        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder.class);
+                org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder.class);
       }
 
       public static Parser<FileEntry> PARSER =
@@ -293,20 +293,20 @@ public final class DebugJsProtoBuf {
       }
 
       private int bitField0_;
-      // required string name = 1;
-      public static final int NAME_FIELD_NUMBER = 1;
-      private Object name_;
+      // required string path = 1;
+      public static final int PATH_FIELD_NUMBER = 1;
+      private Object path_;
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
-      public boolean hasName() {
+      public boolean hasPath() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
-      public String getName() {
-        Object ref = name_;
+      public String getPath() {
+        Object ref = path_;
         if (ref instanceof String) {
           return (String) ref;
         } else {
@@ -314,22 +314,22 @@ public final class DebugJsProtoBuf {
               (ByteString) ref;
           String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
-            name_ = s;
+            path_ = s;
           }
           return s;
         }
       }
       /**
-       * <code>required string name = 1;</code>
+       * <code>required string path = 1;</code>
        */
       public ByteString
-          getNameBytes() {
-        Object ref = name_;
+          getPathBytes() {
+        Object ref = path_;
         if (ref instanceof String) {
           ByteString b =
               ByteString.copyFromUtf8(
                   (String) ref);
-          name_ = b;
+          path_ = b;
           return b;
         } else {
           return (ByteString) ref;
@@ -353,7 +353,7 @@ public final class DebugJsProtoBuf {
       }
 
       private void initFields() {
-        name_ = "";
+        path_ = "";
         content_ = ByteString.EMPTY;
       }
       private byte memoizedIsInitialized = -1;
@@ -361,7 +361,7 @@ public final class DebugJsProtoBuf {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized != -1) return isInitialized == 1;
 
-        if (!hasName()) {
+        if (!hasPath()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -377,7 +377,7 @@ public final class DebugJsProtoBuf {
                           throws IOException {
         getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeBytes(1, getNameBytes());
+          output.writeBytes(1, getPathBytes());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeBytes(2, content_);
@@ -393,7 +393,7 @@ public final class DebugJsProtoBuf {
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += CodedOutputStream
-            .computeBytesSize(1, getNameBytes());
+            .computeBytesSize(1, getPathBytes());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += CodedOutputStream
@@ -411,53 +411,53 @@ public final class DebugJsProtoBuf {
         return super.writeReplace();
       }
 
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           ByteString data)
           throws InvalidProtocolBufferException {
         return PARSER.parseFrom(data);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           ByteString data,
           ExtensionRegistryLite extensionRegistry)
           throws InvalidProtocolBufferException {
         return PARSER.parseFrom(data, extensionRegistry);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(byte[] data)
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(byte[] data)
           throws InvalidProtocolBufferException {
         return PARSER.parseFrom(data);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           byte[] data,
           ExtensionRegistryLite extensionRegistry)
           throws InvalidProtocolBufferException {
         return PARSER.parseFrom(data, extensionRegistry);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(InputStream input)
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(InputStream input)
           throws IOException {
         return PARSER.parseFrom(input);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           InputStream input,
           ExtensionRegistryLite extensionRegistry)
           throws IOException {
         return PARSER.parseFrom(input, extensionRegistry);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseDelimitedFrom(InputStream input)
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseDelimitedFrom(InputStream input)
           throws IOException {
         return PARSER.parseDelimitedFrom(input);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseDelimitedFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseDelimitedFrom(
           InputStream input,
           ExtensionRegistryLite extensionRegistry)
           throws IOException {
         return PARSER.parseDelimitedFrom(input, extensionRegistry);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           CodedInputStream input)
           throws IOException {
         return PARSER.parseFrom(input);
       }
-      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parseFrom(
+      public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parseFrom(
           CodedInputStream input,
           ExtensionRegistryLite extensionRegistry)
           throws IOException {
@@ -466,7 +466,7 @@ public final class DebugJsProtoBuf {
 
       public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry prototype) {
+      public static Builder newBuilder(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry prototype) {
         return newBuilder().mergeFrom(prototype);
       }
       public Builder toBuilder() { return newBuilder(this); }
@@ -478,24 +478,24 @@ public final class DebugJsProtoBuf {
         return builder;
       }
       /**
-       * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Files.FileEntry}
+       * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Library.FileEntry}
        */
       public static final class Builder extends
           GeneratedMessage.Builder<Builder>
-         implements org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder {
+         implements org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder {
         public static final Descriptors.Descriptor
             getDescriptor() {
-          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor;
+          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor;
         }
 
         protected GeneratedMessage.FieldAccessorTable
             internalGetFieldAccessorTable() {
-          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_fieldAccessorTable
+          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_fieldAccessorTable
               .ensureFieldAccessorsInitialized(
-                  org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder.class);
+                  org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder.class);
         }
 
-        // Construct using org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.newBuilder()
+        // Construct using org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.newBuilder()
         private Builder() {
           maybeForceBuilderInitialization();
         }
@@ -515,7 +515,7 @@ public final class DebugJsProtoBuf {
 
         public Builder clear() {
           super.clear();
-          name_ = "";
+          path_ = "";
           bitField0_ = (bitField0_ & ~0x00000001);
           content_ = ByteString.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -528,29 +528,29 @@ public final class DebugJsProtoBuf {
 
         public Descriptors.Descriptor
             getDescriptorForType() {
-          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor;
+          return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor;
         }
 
-        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry getDefaultInstanceForType() {
+        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry getDefaultInstanceForType() {
           return getDefaultInstance();
         }
 
-        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry build() {
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry result = buildPartial();
+        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry build() {
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry result = buildPartial();
           if (!result.isInitialized()) {
             throw newUninitializedMessageException(result);
           }
           return result;
         }
 
-        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry buildPartial() {
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry result = new org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry(this);
+        public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry buildPartial() {
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry result = new org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry(this);
           int from_bitField0_ = bitField0_;
           int to_bitField0_ = 0;
           if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
             to_bitField0_ |= 0x00000001;
           }
-          result.name_ = name_;
+          result.path_ = path_;
           if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
             to_bitField0_ |= 0x00000002;
           }
@@ -561,19 +561,19 @@ public final class DebugJsProtoBuf {
         }
 
         public Builder mergeFrom(Message other) {
-          if (other instanceof org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry) {
-            return mergeFrom((org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry)other);
+          if (other instanceof org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry) {
+            return mergeFrom((org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry)other);
           } else {
             super.mergeFrom(other);
             return this;
           }
         }
 
-        public Builder mergeFrom(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry other) {
+        public Builder mergeFrom(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry other) {
           if (other == getDefaultInstance()) return this;
-          if (other.hasName()) {
+          if (other.hasPath()) {
             bitField0_ |= 0x00000001;
-            name_ = other.name_;
+            path_ = other.path_;
             onChanged();
           }
           if (other.hasContent()) {
@@ -584,7 +584,7 @@ public final class DebugJsProtoBuf {
         }
 
         public final boolean isInitialized() {
-          if (!hasName()) {
+          if (!hasPath()) {
             
             return false;
           }
@@ -599,11 +599,11 @@ public final class DebugJsProtoBuf {
             CodedInputStream input,
             ExtensionRegistryLite extensionRegistry)
             throws IOException {
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry parsedMessage = null;
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry parsedMessage = null;
           try {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (InvalidProtocolBufferException e) {
-            parsedMessage = (org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry) e.getUnfinishedMessage();
+            parsedMessage = (org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry) e.getUnfinishedMessage();
             throw e;
           } finally {
             if (parsedMessage != null) {
@@ -614,76 +614,76 @@ public final class DebugJsProtoBuf {
         }
         private int bitField0_;
 
-        // required string name = 1;
-        private Object name_ = "";
+        // required string path = 1;
+        private Object path_ = "";
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
-        public boolean hasName() {
+        public boolean hasPath() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
-        public String getName() {
-          Object ref = name_;
+        public String getPath() {
+          Object ref = path_;
           if (!(ref instanceof String)) {
             String s = ((ByteString) ref)
                 .toStringUtf8();
-            name_ = s;
+            path_ = s;
             return s;
           } else {
             return (String) ref;
           }
         }
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
         public ByteString
-            getNameBytes() {
-          Object ref = name_;
+            getPathBytes() {
+          Object ref = path_;
           if (ref instanceof String) {
             ByteString b =
                 ByteString.copyFromUtf8(
                     (String) ref);
-            name_ = b;
+            path_ = b;
             return b;
           } else {
             return (ByteString) ref;
           }
         }
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
-        public Builder setName(
+        public Builder setPath(
             String value) {
           if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-          name_ = value;
+          path_ = value;
           onChanged();
           return this;
         }
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
-        public Builder clearName() {
+        public Builder clearPath() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          name_ = getDefaultInstance().getName();
+          path_ = getDefaultInstance().getPath();
           onChanged();
           return this;
         }
         /**
-         * <code>required string name = 1;</code>
+         * <code>required string path = 1;</code>
          */
-        public Builder setNameBytes(
+        public Builder setPathBytes(
             ByteString value) {
           if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-          name_ = value;
+          path_ = value;
           onChanged();
           return this;
         }
@@ -724,7 +724,7 @@ public final class DebugJsProtoBuf {
           return this;
         }
 
-        // @@protoc_insertion_point(builder_scope:org.jetbrains.kotlin.serialization.js.Files.FileEntry)
+        // @@protoc_insertion_point(builder_scope:org.jetbrains.kotlin.serialization.js.Library.FileEntry)
       }
 
       static {
@@ -732,41 +732,41 @@ public final class DebugJsProtoBuf {
         defaultInstance.initFields();
       }
 
-      // @@protoc_insertion_point(class_scope:org.jetbrains.kotlin.serialization.js.Files.FileEntry)
+      // @@protoc_insertion_point(class_scope:org.jetbrains.kotlin.serialization.js.Library.FileEntry)
     }
 
-    // repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;
+    // repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;
     public static final int ENTRY_FIELD_NUMBER = 1;
-    private List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry> entry_;
+    private List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry> entry_;
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry> getEntryList() {
+    public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry> getEntryList() {
       return entry_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    public List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder>
+    public List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder>
         getEntryOrBuilderList() {
       return entry_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
     public int getEntryCount() {
       return entry_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry getEntry(int index) {
+    public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry getEntry(int index) {
       return entry_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
      */
-    public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder getEntryOrBuilder(
+    public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder getEntryOrBuilder(
         int index) {
       return entry_.get(index);
     }
@@ -820,53 +820,53 @@ public final class DebugJsProtoBuf {
       return super.writeReplace();
     }
 
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         ByteString data)
         throws InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         ByteString data,
         ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(byte[] data)
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(byte[] data)
         throws InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         byte[] data,
         ExtensionRegistryLite extensionRegistry)
         throws InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(InputStream input)
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(InputStream input)
         throws IOException {
       return PARSER.parseFrom(input);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         InputStream input,
         ExtensionRegistryLite extensionRegistry)
         throws IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseDelimitedFrom(InputStream input)
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseDelimitedFrom(InputStream input)
         throws IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseDelimitedFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseDelimitedFrom(
         InputStream input,
         ExtensionRegistryLite extensionRegistry)
         throws IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         CodedInputStream input)
         throws IOException {
       return PARSER.parseFrom(input);
     }
-    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parseFrom(
+    public static org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parseFrom(
         CodedInputStream input,
         ExtensionRegistryLite extensionRegistry)
         throws IOException {
@@ -875,7 +875,7 @@ public final class DebugJsProtoBuf {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files prototype) {
+    public static Builder newBuilder(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -887,28 +887,28 @@ public final class DebugJsProtoBuf {
       return builder;
     }
     /**
-     * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Files}
+     * Protobuf type {@code org.jetbrains.kotlin.serialization.js.Library}
      *
      * <pre>
-     * For Kotlin/Javascript we reuse builtins serialization code, in which there are files for each package (see BuiltinsSerializationUtil)
+     * For Kotlin/Javascript we reuse builtins serialization code.
      * </pre>
      */
     public static final class Builder extends
         GeneratedMessage.Builder<Builder>
-       implements org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.FilesOrBuilder {
+       implements org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.LibraryOrBuilder {
       public static final Descriptors.Descriptor
           getDescriptor() {
-        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor;
+        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor;
       }
 
       protected GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_fieldAccessorTable
+        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.Builder.class);
+                org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.class, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.Builder.class);
       }
 
-      // Construct using org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.newBuilder()
+      // Construct using org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -944,23 +944,23 @@ public final class DebugJsProtoBuf {
 
       public Descriptors.Descriptor
           getDescriptorForType() {
-        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor;
+        return org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor;
       }
 
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files getDefaultInstanceForType() {
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library getDefaultInstanceForType() {
         return getDefaultInstance();
       }
 
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files build() {
-        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files result = buildPartial();
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library build() {
+        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files buildPartial() {
-        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files result = new org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files(this);
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library buildPartial() {
+        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library result = new org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library(this);
         int from_bitField0_ = bitField0_;
         if (entryBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -976,15 +976,15 @@ public final class DebugJsProtoBuf {
       }
 
       public Builder mergeFrom(Message other) {
-        if (other instanceof org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files) {
-          return mergeFrom((org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files)other);
+        if (other instanceof org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library) {
+          return mergeFrom((org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files other) {
+      public Builder mergeFrom(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library other) {
         if (other == getDefaultInstance()) return this;
         if (entryBuilder_ == null) {
           if (!other.entry_.isEmpty()) {
@@ -1030,11 +1030,11 @@ public final class DebugJsProtoBuf {
           CodedInputStream input,
           ExtensionRegistryLite extensionRegistry)
           throws IOException {
-        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files parsedMessage = null;
+        org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (InvalidProtocolBufferException e) {
-          parsedMessage = (org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files) e.getUnfinishedMessage();
+          parsedMessage = (org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -1045,23 +1045,23 @@ public final class DebugJsProtoBuf {
       }
       private int bitField0_;
 
-      // repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;
-      private List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry> entry_ =
+      // repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;
+      private List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry> entry_ =
         Collections.emptyList();
       private void ensureEntryIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          entry_ = new ArrayList<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry>(entry_);
+          entry_ = new ArrayList<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry>(entry_);
           bitField0_ |= 0x00000001;
          }
       }
 
       private RepeatedFieldBuilder<
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder> entryBuilder_;
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder> entryBuilder_;
 
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry> getEntryList() {
+      public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry> getEntryList() {
         if (entryBuilder_ == null) {
           return Collections.unmodifiableList(entry_);
         } else {
@@ -1069,7 +1069,7 @@ public final class DebugJsProtoBuf {
         }
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public int getEntryCount() {
         if (entryBuilder_ == null) {
@@ -1079,9 +1079,9 @@ public final class DebugJsProtoBuf {
         }
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry getEntry(int index) {
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry getEntry(int index) {
         if (entryBuilder_ == null) {
           return entry_.get(index);
         } else {
@@ -1089,10 +1089,10 @@ public final class DebugJsProtoBuf {
         }
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder setEntry(
-          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry value) {
+          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry value) {
         if (entryBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1106,10 +1106,10 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder setEntry(
-          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder builderForValue) {
+          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder builderForValue) {
         if (entryBuilder_ == null) {
           ensureEntryIsMutable();
           entry_.set(index, builderForValue.build());
@@ -1120,9 +1120,9 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public Builder addEntry(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry value) {
+      public Builder addEntry(org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry value) {
         if (entryBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1136,10 +1136,10 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder addEntry(
-          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry value) {
+          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry value) {
         if (entryBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1153,10 +1153,10 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder addEntry(
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder builderForValue) {
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder builderForValue) {
         if (entryBuilder_ == null) {
           ensureEntryIsMutable();
           entry_.add(builderForValue.build());
@@ -1167,10 +1167,10 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder addEntry(
-          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder builderForValue) {
+          int index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder builderForValue) {
         if (entryBuilder_ == null) {
           ensureEntryIsMutable();
           entry_.add(index, builderForValue.build());
@@ -1181,10 +1181,10 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder addAllEntry(
-          Iterable<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry> values) {
+          Iterable<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry> values) {
         if (entryBuilder_ == null) {
           ensureEntryIsMutable();
           addAll(values, entry_);
@@ -1195,7 +1195,7 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder clearEntry() {
         if (entryBuilder_ == null) {
@@ -1208,7 +1208,7 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
       public Builder removeEntry(int index) {
         if (entryBuilder_ == null) {
@@ -1221,16 +1221,16 @@ public final class DebugJsProtoBuf {
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder getEntryBuilder(
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder getEntryBuilder(
           int index) {
         return getEntryFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder getEntryOrBuilder(
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder getEntryOrBuilder(
           int index) {
         if (entryBuilder_ == null) {
           return entry_.get(index);  } else {
@@ -1238,9 +1238,9 @@ public final class DebugJsProtoBuf {
         }
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder>
+      public List<? extends org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder>
            getEntryOrBuilderList() {
         if (entryBuilder_ != null) {
           return entryBuilder_.getMessageOrBuilderList();
@@ -1249,33 +1249,33 @@ public final class DebugJsProtoBuf {
         }
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder addEntryBuilder() {
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder addEntryBuilder() {
         return getEntryFieldBuilder().addBuilder(
-            org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.getDefaultInstance());
+            org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.getDefaultInstance());
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder addEntryBuilder(
+      public org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder addEntryBuilder(
           int index) {
         return getEntryFieldBuilder().addBuilder(
-            index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.getDefaultInstance());
+            index, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.getDefaultInstance());
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.serialization.js.Files.FileEntry entry = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.serialization.js.Library.FileEntry entry = 1;</code>
        */
-      public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder>
+      public List<org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder>
            getEntryBuilderList() {
         return getEntryFieldBuilder().getBuilderList();
       }
       private RepeatedFieldBuilder<
-          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder> 
+          org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder> 
           getEntryFieldBuilder() {
         if (entryBuilder_ == null) {
           entryBuilder_ = new RepeatedFieldBuilder<
-              org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Files.FileEntryOrBuilder>(
+              org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntry.Builder, org.jetbrains.kotlin.serialization.js.DebugJsProtoBuf.Library.FileEntryOrBuilder>(
                   entry_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
                   getParentForChildren(),
@@ -1285,27 +1285,27 @@ public final class DebugJsProtoBuf {
         return entryBuilder_;
       }
 
-      // @@protoc_insertion_point(builder_scope:org.jetbrains.kotlin.serialization.js.Files)
+      // @@protoc_insertion_point(builder_scope:org.jetbrains.kotlin.serialization.js.Library)
     }
 
     static {
-      defaultInstance = new Files(true);
+      defaultInstance = new Library(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:org.jetbrains.kotlin.serialization.js.Files)
+    // @@protoc_insertion_point(class_scope:org.jetbrains.kotlin.serialization.js.Library)
   }
 
   private static Descriptors.Descriptor
-    internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor;
+    internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor;
   private static
     GeneratedMessage.FieldAccessorTable
-      internal_static_org_jetbrains_kotlin_serialization_js_Files_fieldAccessorTable;
+      internal_static_org_jetbrains_kotlin_serialization_js_Library_fieldAccessorTable;
   private static Descriptors.Descriptor
-    internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor;
+    internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor;
   private static
     GeneratedMessage.FieldAccessorTable
-      internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_fieldAccessorTable;
+      internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_fieldAccessorTable;
 
   public static Descriptors.FileDescriptor
       getDescriptor() {
@@ -1317,28 +1317,28 @@ public final class DebugJsProtoBuf {
     String[] descriptorData = {
       "\n(core/serialization.js/src/js.debug.pro" +
       "to\022%org.jetbrains.kotlin.serialization.j" +
-      "s\"z\n\005Files\022E\n\005entry\030\001 \003(\01326.org.jetbrain" +
-      "s.kotlin.serialization.js.Files.FileEntr" +
-      "y\032*\n\tFileEntry\022\014\n\004name\030\001 \002(\t\022\017\n\007content\030" +
-      "\002 \002(\014B\021B\017DebugJsProtoBuf"
+      "s\"~\n\007Library\022G\n\005entry\030\001 \003(\01328.org.jetbra" +
+      "ins.kotlin.serialization.js.Library.File" +
+      "Entry\032*\n\tFileEntry\022\014\n\004path\030\001 \002(\t\022\017\n\007cont" +
+      "ent\030\002 \002(\014B\021B\017DebugJsProtoBuf"
     };
     Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public ExtensionRegistry assignDescriptors(
             Descriptors.FileDescriptor root) {
           descriptor = root;
-          internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor =
+          internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor =
             getDescriptor().getMessageTypes().get(0);
-          internal_static_org_jetbrains_kotlin_serialization_js_Files_fieldAccessorTable = new
+          internal_static_org_jetbrains_kotlin_serialization_js_Library_fieldAccessorTable = new
             GeneratedMessage.FieldAccessorTable(
-              internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor,
+              internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor,
               new String[] { "Entry", });
-          internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor =
-            internal_static_org_jetbrains_kotlin_serialization_js_Files_descriptor.getNestedTypes().get(0);
-          internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_fieldAccessorTable = new
+          internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor =
+            internal_static_org_jetbrains_kotlin_serialization_js_Library_descriptor.getNestedTypes().get(0);
+          internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_fieldAccessorTable = new
             GeneratedMessage.FieldAccessorTable(
-              internal_static_org_jetbrains_kotlin_serialization_js_Files_FileEntry_descriptor,
-              new String[] { "Name", "Content", });
+              internal_static_org_jetbrains_kotlin_serialization_js_Library_FileEntry_descriptor,
+              new String[] { "Path", "Content", });
           return null;
         }
       };

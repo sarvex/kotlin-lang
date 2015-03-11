@@ -35,13 +35,13 @@ public object KotlinJavascriptSerializationUtil {
     platformStatic
     public fun getPackageFragmentProviders(moduleDescriptor: ModuleDescriptor, metadata: ByteArray): List<PackageFragmentProvider> {
         val gzipInputStream = GZIPInputStream(ByteArrayInputStream(metadata))
-        val content = JsProtoBuf.Files.parseFrom(gzipInputStream)
+        val content = JsProtoBuf.Library.parseFrom(gzipInputStream)
         gzipInputStream.close()
 
         val contentMap: MutableMap<String, ByteArray> = hashMapOf()
         for(index in 0..content.getEntryCount()-1) {
             val entry = content.getEntry(index)
-            contentMap[entry.getName()] = entry.getContent().toByteArray()
+            contentMap[entry.getPath()] = entry.getContent().toByteArray()
         }
 
         val packages = getPackages(contentMap)
@@ -59,9 +59,9 @@ public object KotlinJavascriptSerializationUtil {
     }
 
     public fun contentMapToByteArray(contentMap: Map<String, ByteArray>): ByteArray {
-        val contentBuilder = JsProtoBuf.Files.newBuilder()
+        val contentBuilder = JsProtoBuf.Library.newBuilder()
         contentMap forEach {
-            val entry = JsProtoBuf.Files.FileEntry.newBuilder().setName(it.getKey()).setContent(ByteString.copyFrom(it.getValue())).build()
+            val entry = JsProtoBuf.Library.FileEntry.newBuilder().setPath(it.getKey()).setContent(ByteString.copyFrom(it.getValue())).build()
             contentBuilder.addEntry(entry)
         }
 

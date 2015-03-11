@@ -19,10 +19,10 @@ package org.jetbrains.kotlin.serialization.js;
 option java_outer_classname = "JsProtoBuf";
 option optimize_for = LITE_RUNTIME;
 
-// For Kotlin/Javascript we reuse builtins serialization code, in which there are files for each package (see BuiltinsSerializationUtil)
-message Files {
+// For Kotlin/Javascript we reuse builtins serialization code.
+message Library {
   message FileEntry {
-    required string name = 1;
+    required string path = 1;
     required bytes content = 2;
   }
 
