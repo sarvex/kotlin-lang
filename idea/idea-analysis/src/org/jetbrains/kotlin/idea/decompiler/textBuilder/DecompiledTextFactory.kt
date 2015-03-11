@@ -76,17 +76,15 @@ public fun buildDecompiledText(
     }
 }
 
-public fun buildDecompiledTextJS(
+public fun buildDecompiledTextFromJsMetadata(
         classFile: VirtualFile
 ): DecompiledText {
     val module = classFile.getUserData(JsMetaFileVirtualFileHolder.MODULE_DESCRIPTOR_KEY)
     assert(module != null)
 
-    val fileName = classFile.getName()
-    val index = fileName.lastIndexOf('/')
-    val correctedFileName =  if (index > 0) fileName.substring(index+1) else fileName
-    val packageName = correctedFileName.substring(0, correctedFileName.length() - ".meta".length())
-    val packageFqName = FqName(packageName)
+    val packageFqName = classFile.getUserData(JsMetaFileVirtualFileHolder.PACKAGE_FQNAME_KEY)
+    assert (packageFqName != null)
+
     val fragments = module.getPackageFragmentProvider().getPackageFragments(packageFqName)
     val descriptors = fragments.flatMap { it.getMemberScope().getAllDescriptors() }
 
