@@ -479,7 +479,7 @@ var Kotlin = {};
         return fun;
     };
 
-    Kotlin.kotlin_module_metadata = function (abiVersion, moduleName, data) {
+    Kotlin.kotlinModuleMetadata = function (abiVersion, moduleName, data) {
     };
 
 })(Kotlin);
