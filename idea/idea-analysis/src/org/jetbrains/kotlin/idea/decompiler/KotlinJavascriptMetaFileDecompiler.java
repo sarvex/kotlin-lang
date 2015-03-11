@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.idea.decompiler.stubBuilder.KotlinClsStubBuilder;
 
-public class JetJsMetaFileDecompiler extends ClassFileDecompilers.Full {
+public class KotlinJavascriptMetaFileDecompiler extends ClassFileDecompilers.Full {
     private final ClsStubBuilder stubBuilder = new KotlinClsStubBuilder() {
         @Nullable
         @Override
@@ -50,6 +50,6 @@ public class JetJsMetaFileDecompiler extends ClassFileDecompilers.Full {
     @NotNull
     @Override
     public FileViewProvider createFileViewProvider(@NotNull VirtualFile file, @NotNull PsiManager manager, boolean physical) {
-        return new JetJsMetaFileViewProvider(manager, file, physical, DecompilerPackage.isKotlinInternalCompiledFile(file));
+        return new KotlinJavascriptMetaFileViewProvider(manager, file, physical, DecompilerPackage.isKotlinInternalCompiledFile(file));
     }
 }

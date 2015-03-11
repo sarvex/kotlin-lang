@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.idea.decompiler.textBuilder.descriptorToKey
 import org.jetbrains.kotlin.utils.concurrent.block.LockedClearableLazyValue
 import org.jetbrains.kotlin.psi.JetFile
 
-public abstract class JetClsFileBase(provider: FileViewProvider) : JetFile(provider, true) {
+public abstract class KotlinClsFileBase(provider: FileViewProvider) : JetFile(provider, true) {
     protected abstract val decompiledText: LockedClearableLazyValue<DecompiledText>
 
     public fun getDeclarationForDescriptor(descriptor: DeclarationDescriptor): JetDeclaration? {

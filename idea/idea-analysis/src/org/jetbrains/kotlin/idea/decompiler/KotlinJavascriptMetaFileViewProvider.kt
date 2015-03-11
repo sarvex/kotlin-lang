@@ -25,7 +25,7 @@ import com.intellij.psi.SingleRootFileViewProvider
 import org.jetbrains.kotlin.idea.JetLanguage
 import kotlin.properties.Delegates
 
-public class JetJsMetaFileViewProvider (
+public class KotlinJavascriptMetaFileViewProvider (
         manager: PsiManager,
         val file: VirtualFile,
         physical: Boolean,
@@ -33,7 +33,7 @@ public class JetJsMetaFileViewProvider (
 
     val jetJsMetaFile by Delegates.blockingLazy(this) {
         //TODO: check index that file is library file, as in ClassFileViewProvider
-        if (!isInternal) JetJsMetaFile(this) else null
+        if (!isInternal) KotlinJavascriptMetaFile(this) else null
     }
 
     override fun getContents(): CharSequence {
@@ -43,6 +43,6 @@ public class JetJsMetaFileViewProvider (
     override fun createFile(project: Project, file: VirtualFile, fileType: FileType): PsiFile? = jetJsMetaFile
 
     override fun createCopy(copy: VirtualFile): SingleRootFileViewProvider {
-        return JetJsMetaFileViewProvider(getManager(), copy, false, isInternal)
+        return KotlinJavascriptMetaFileViewProvider(getManager(), copy, false, isInternal)
     }
 }
