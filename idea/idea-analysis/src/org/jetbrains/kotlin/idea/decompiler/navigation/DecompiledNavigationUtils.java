@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.idea.caches.resolve.JsProjectDetector;
 import org.jetbrains.kotlin.idea.decompiler.DecompilerPackage;
-import org.jetbrains.kotlin.idea.decompiler.JetClsFileBase;
+import org.jetbrains.kotlin.idea.decompiler.KotlinClsFileBase;
 import org.jetbrains.kotlin.idea.stubindex.JetSourceFilterScope;
 import org.jetbrains.kotlin.load.kotlin.PackageClassUtils;
 import org.jetbrains.kotlin.load.kotlin.VirtualFileFinder;
@@ -48,7 +48,7 @@ public final class DecompiledNavigationUtils {
     ) {
         VirtualFile virtualFile;
 
-        if (JsProjectDetector.isJsProject(project)) {
+        if (JsProjectDetector.isJsProject(project) && NavigationPackage.getKotlinJavascriptLibrary(referencedDescriptor, project) != null) {
             JsMetaFileVirtualFileHolder system = JsMetaFileVirtualFileHolder.getInstance(project);
             virtualFile = system.getFile(referencedDescriptor);
             if (virtualFile == null) return null;
@@ -59,11 +59,11 @@ public final class DecompiledNavigationUtils {
         }
 
         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-        if (!(psiFile instanceof JetClsFileBase)) {
+        if (!(psiFile instanceof KotlinClsFileBase)) {
             return null;
         }
 
-        return ((JetClsFileBase) psiFile).getDeclarationForDescriptor(referencedDescriptor);
+        return ((KotlinClsFileBase) psiFile).getDeclarationForDescriptor(referencedDescriptor);
     }
 
     /*
