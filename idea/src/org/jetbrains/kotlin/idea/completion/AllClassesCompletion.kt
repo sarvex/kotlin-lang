@@ -68,13 +68,12 @@ class AllClassesCompletion(val parameters: CompletionParameters,
         collector.addDescriptorElements(classDescriptors, suppressAutoInsertion = true)
     }
 
-    private val allClassDescriptors = CachedValuesManager.getManager(scope.getProject()).createCachedValue(
-            {
-                val provider = (moduleDescriptor as ModuleDescriptorImpl).getPackageFragmentProvider()
-                val fragments = DescriptorUtils.getPackagesFqNames(moduleDescriptor).flatMap { provider.getPackageFragments(it) }
-                val classDescriptors = fragments.flatMap { it.getMemberScope().getAllDescriptors().filter { it is ClassDescriptor} }.map { it as ClassDescriptor }
-                CachedValueProvider.Result(classDescriptors, ProjectRootModificationTracker.getInstance(scope.getProject()))
-            }, false)
+    private val allClassDescriptors = CachedValuesManager.getManager(scope.getProject()).createCachedValue( {
+        val provider = (moduleDescriptor as ModuleDescriptorImpl).getPackageFragmentProvider()
+        val fragments = DescriptorUtils.getPackagesFqNames(moduleDescriptor).flatMap { provider.getPackageFragments(it) }
+        val classDescriptors = fragments.flatMap { it.getMemberScope().getAllDescriptors().filter { it is ClassDescriptor} }.map { it as ClassDescriptor }
+        CachedValueProvider.Result(classDescriptors, ProjectRootModificationTracker.getInstance(scope.getProject()))
+    }, false)
 
     private fun addAdaptedJavaCompletion(collector: LookupElementsCollector) {
         AllClassesGetter.processJavaClasses(parameters, prefixMatcher, true, { psiClass ->
