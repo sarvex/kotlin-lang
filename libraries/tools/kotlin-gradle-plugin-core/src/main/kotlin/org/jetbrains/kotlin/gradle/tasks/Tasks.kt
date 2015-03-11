@@ -202,9 +202,6 @@ public open class Kotlin2JsCompile() : AbstractKotlinCompile<K2JSCompilerArgumen
     public val outputFile: String?
             get() = kotlinOptions.outputFile
 
-    public val metaFile: String?
-        get() = kotlinOptions.metaInfo
-
     public val sourceMapDestinationDir: File
             get() = File(outputFile).directory
 
