@@ -41,7 +41,7 @@ public object KotlinJavascriptMetadataUtils {
     public fun hasMetadata(text: String): Boolean = METADATA_PATTERN.matcher(text).find()
 
     public fun writeMetadata(moduleName: String, content: ByteArray, metaFile: File) {
-        val text = "// Kotlin.$KOTLIN_JAVASCRIPT_METHOD_NAME($ABI_VERSION,\"$moduleName\",\"${printBase64Binary(content)}\");\n"
+        val text = "// Kotlin.$KOTLIN_JAVASCRIPT_METHOD_NAME($ABI_VERSION, \"$moduleName\", \"${printBase64Binary(content)}\");\n"
         FileUtil.writeToFile(metaFile, text)
     }
 
