@@ -29,9 +29,7 @@ fun String.getRootName(): String {
 
 }
 
-fun File.getRootName(): String {
-    return this.separatorsToSystem().getRootName()
-}
+fun File.getRootName(): String = separatorsToSystem().getRootName()
 
 /**
  * Returns root component of this abstract name, like / from /home/user or C:\ from C:\file.tmp
@@ -39,7 +37,7 @@ fun File.getRootName(): String {
  */
 public fun File.getRoot(): File? {
     val name = getRootName()
-    return if (name.length() > 0) File(getRootName()) else null
+    return if (name.length() > 0) File(name) else null
 }
 
 /**

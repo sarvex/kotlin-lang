@@ -1,6 +1,7 @@
 package kotlin.io
 
 import java.io.*
+import java.util.ArrayList
 
 /**
  * Create an empty directory in the specified directory, using the given prefix and suffix to generate its name.
@@ -385,9 +386,7 @@ public fun File.startsWith(o: File): Boolean {
  * Returns true if this file belongs to the same root as [o]
  * and starts with all components of [o] in the same order
  */
-public fun File.startsWith(o: String): Boolean {
-    return startsWith(File(o))
-}
+public fun File.startsWith(o: String): Boolean = startsWith(File(o))
 
 /**
  * Returns true if this file belongs to the same root as [o]
@@ -427,6 +426,72 @@ public fun File.endsWith(o: File): Boolean {
  * Returns true if this file belongs to the same root as [o]
  * and ends with all components of [o] in the same order
  */
-public fun File.endsWith(o: String): Boolean {
-    return endsWith(File(o))
+public fun File.endsWith(o: String): Boolean = endsWith(File(o))
+
+/**
+ * Removes all . and resolves all possible .. in a file name
+ */
+public fun File.normalize(): File {
+    val rootName = getRootName()
+    val list: MutableList<String> = ArrayList()
+    for (elem in this)
+        if (elem.toString() != ".")
+            list.add(elem.toString())
+    var first = 0
+    val dots = list.subList(first, list.size()).indexOf("..")
+    while (dots != -1) {
+        if (dots > first) {
+            list.remove(dots)
+            list.remove(dots-1)
+        } else {
+            first++
+        }
+    }
+    var res = rootName
+    var addSeparator = !res.endsWith(File.separatorChar)
+    for (elem in list) {
+        if (addSeparator)
+            res += File.separatorChar
+        res += elem
+        addSeparator = true
+    }
+    return File(res)
 }
+
+/**
+ * Adds relative [o] to this, considering this as a directory.
+ * If [o] has a root, [o] is returned back
+ */
+public fun File.resolve(o: File): File {
+    if (o.getRoot() != null)
+        return o
+    val ourName = toString()
+    if (ourName.endsWith(File.separatorChar))
+        return File(ourName + o)
+    else
+        return File(ourName + File.separatorChar + o)
+}
+
+/**
+ * Adds relative [o] to this, considering this as a directory.
+ * If [o] has a root, [o] is returned back
+ */
+public fun File.resolve(o: String): File = resolve(File(o))
+
+/**
+ * Adds relative [o] to this parent directory.
+ * If [o] has a root or this has no parent directory, [o] is returned back
+ */
+public fun File.resolveSibling(o: File): File {
+    val parentFile = getParentFile()
+    if (parentFile != null)
+        return parentFile.resolve(o)
+    else
+        return o
+}
+
+/**
+ * Adds relative [o] to this parent directory.
+ * If [o] has a root or this has no parent directory, [o] is returned back
+ */
+public fun File.resolveSibling(o: String): File = resolveSibling(File(o))
