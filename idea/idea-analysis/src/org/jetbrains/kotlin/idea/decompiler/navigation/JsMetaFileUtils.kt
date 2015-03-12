@@ -21,6 +21,7 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootModificationTracker
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.util.Key
@@ -33,12 +34,13 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.idea.caches.resolve.LIBRARY_NAME_PREFIX
+import org.jetbrains.kotlin.idea.framework.JsHeaderLibraryDetectionUtil
 import org.jetbrains.kotlin.idea.project.ProjectStructureUtil
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import kotlin.platform.platformStatic
 
-fun getKotlinJavascriptLibrary(descriptor: DeclarationDescriptor, project: Project): Library? {
+fun getKotlinJavascriptLibraryWithMetadata(descriptor: DeclarationDescriptor, project: Project): Library? {
     val containingPackageFragment = DescriptorUtils.getParentOfType<PackageFragmentDescriptor>(descriptor, javaClass<PackageFragmentDescriptor>())
     if (containingPackageFragment == null) return null
 
@@ -47,17 +49,10 @@ fun getKotlinJavascriptLibrary(descriptor: DeclarationDescriptor, project: Proje
 
     var moduleName = getModuleName(module)
 
-    return getKotlinJavascriptLibrary(moduleName, project)
-}
+    val library = getKotlinJavascriptLibrary(moduleName, project)
 
-fun getKotlinJavascriptLibrary(libraryName: String, project: Project): Library? {
-    var library: Library? = null
-    val jsModules = ModuleManager.getInstance(project).getModules().filter { (ProjectStructureUtil.isJsKotlinModule(it)) }
-    jsModules.forEach { module ->
-        ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary {
-            if (it.getName() == libraryName) { library = it; false } else true
-        }
-    }
+    if (library == null ||
+        JsHeaderLibraryDetectionUtil.isJsHeaderLibraryWithSources(library.getFiles(OrderRootType.CLASSES).toList())) return null
 
     return library
 }
@@ -69,6 +64,18 @@ fun getKotlinJavascriptLibrary(file: VirtualFile, project: Project): Library? {
     var moduleName = getModuleName(module)
 
     return getKotlinJavascriptLibrary(moduleName, project)
+}
+
+private fun getKotlinJavascriptLibrary(libraryName: String, project: Project): Library? {
+    var library: Library? = null
+    val jsModules = ModuleManager.getInstance(project).getModules().filter { (ProjectStructureUtil.isJsKotlinModule(it)) }
+    jsModules.forEach { module ->
+        ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary {
+            if (it.getName() == libraryName) { library = it; false } else true
+        }
+    }
+
+    return library
 }
 
 private fun getModuleName(module: ModuleDescriptor): String {
