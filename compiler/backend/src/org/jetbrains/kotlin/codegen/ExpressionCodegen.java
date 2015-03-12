@@ -65,6 +65,7 @@ import org.jetbrains.kotlin.resolve.constants.CompileTimeConstant;
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstant;
 import org.jetbrains.kotlin.resolve.constants.evaluate.EvaluatePackage;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilPackage;
+import org.jetbrains.kotlin.resolve.jvm.diagnostics.ErrorsJvm;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.resolve.scopes.receivers.*;
 import org.jetbrains.kotlin.types.Approximation;
@@ -97,6 +98,7 @@ import static org.jetbrains.kotlin.resolve.jvm.AsmTypes.*;
 import static org.jetbrains.kotlin.resolve.jvm.diagnostics.DiagnosticsPackage.OtherOrigin;
 import static org.jetbrains.kotlin.resolve.jvm.diagnostics.DiagnosticsPackage.TraitImpl;
 import static org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue.NO_RECEIVER;
+import static org.jetbrains.kotlin.serialization.deserialization.DeserializationPackage.findClassAcrossModuleDependencies;
 import static org.jetbrains.org.objectweb.asm.Opcodes.ACC_PRIVATE;
 
 public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implements LocalLookup {
@@ -1447,8 +1449,9 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                     List<ValueParameterDescriptor> superValueParameters = superConstructor.getValueParameters();
                     int params = superValueParameters.size();
                     List<Type> superMappedTypes = typeMapper.mapToCallableMethod(superConstructor).getValueParameterTypes();
-                    assert superMappedTypes.size() >= params : String.format("Incorrect number of mapped parameters vs arguments: %d < %d for %s",
-                                                                             superMappedTypes.size(), params, classDescriptor);
+                    assert superMappedTypes.size() >= params :
+                            String.format("Incorrect number of mapped parameters vs arguments: %d < %d for %s",
+                                          superMappedTypes.size(), params, classDescriptor);
 
                     List<ResolvedValueArgument> valueArguments = new ArrayList<ResolvedValueArgument>(params);
                     List<ValueParameterDescriptor> valueParameters = new ArrayList<ValueParameterDescriptor>(params);
@@ -1461,7 +1464,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
                             mappedTypes.add(superMappedTypes.get(parameter.getIndex()));
                         }
                     }
-                    ArgumentGenerator argumentGenerator = new CallBasedArgumentGenerator(ExpressionCodegen.this, defaultCallGenerator, valueParameters, mappedTypes);
+                    ArgumentGenerator argumentGenerator =
+                            new CallBasedArgumentGenerator(ExpressionCodegen.this, defaultCallGenerator, valueParameters, mappedTypes);
 
                     argumentGenerator.generate(valueArguments);
                 }
@@ -2649,6 +2653,8 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
 
     @Override
     public StackValue visitClassLiteralExpression(@NotNull JetClassLiteralExpression expression, StackValue data) {
+        checkReflectionIsAvailable(expression);
+
         JetType type = bindingContext.get(EXPRESSION_TYPE, expression);
         assert type != null;
 
@@ -2671,25 +2677,34 @@ public class ExpressionCodegen extends JetVisitor<StackValue, StackValue> implem
         }
 
         VariableDescriptor variableDescriptor = bindingContext.get(VARIABLE, expression);
-        if (variableDescriptor != null) {
-            VariableDescriptor descriptor = (VariableDescriptor) resolvedCall.getResultingDescriptor();
-
-            DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
-            if (containingDeclaration instanceof PackageFragmentDescriptor) {
-                return generateTopLevelPropertyReference(descriptor);
-            }
-            else if (containingDeclaration instanceof ClassDescriptor) {
-                return generateMemberPropertyReference(descriptor, (ClassDescriptor) containingDeclaration);
-            }
-            else if (containingDeclaration instanceof ScriptDescriptor) {
-                return generateMemberPropertyReference(descriptor, ((ScriptDescriptor) containingDeclaration).getClassDescriptor());
-            }
-            else {
-                throw new UnsupportedOperationException("Unsupported callable reference container: " + containingDeclaration);
-            }
+        if (variableDescriptor == null) {
+            throw new UnsupportedOperationException("Unsupported callable reference expression: " + expression.getText());
         }
 
-        throw new UnsupportedOperationException("Unsupported callable reference expression: " + expression.getText());
+        // TODO: this diagnostic should also be reported on function references once they obtain reflection
+        checkReflectionIsAvailable(expression);
+
+        VariableDescriptor descriptor = (VariableDescriptor) resolvedCall.getResultingDescriptor();
+
+        DeclarationDescriptor containingDeclaration = descriptor.getContainingDeclaration();
+        if (containingDeclaration instanceof PackageFragmentDescriptor) {
+            return generateTopLevelPropertyReference(descriptor);
+        }
+        else if (containingDeclaration instanceof ClassDescriptor) {
+            return generateMemberPropertyReference(descriptor, (ClassDescriptor) containingDeclaration);
+        }
+        else if (containingDeclaration instanceof ScriptDescriptor) {
+            return generateMemberPropertyReference(descriptor, ((ScriptDescriptor) containingDeclaration).getClassDescriptor());
+        }
+        else {
+            throw new UnsupportedOperationException("Unsupported callable reference container: " + containingDeclaration);
+        }
+    }
+
+    private void checkReflectionIsAvailable(@NotNull JetExpression expression) {
+        if (findClassAcrossModuleDependencies(state.getModule(), JvmAbi.REFLECTION_FACTORY_IMPL) == null) {
+            state.getDiagnostics().report(ErrorsJvm.NO_REFLECTION_IN_CLASS_PATH.on(expression));
+        }
     }
 
     @NotNull
