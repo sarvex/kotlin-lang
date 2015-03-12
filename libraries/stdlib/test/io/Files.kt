@@ -359,6 +359,43 @@ class FilesTest {
         assertEquals(file3.canonicalPath, file1.relativePath(file3))
     }
 
+    test fun fileIterator() {
+        val file1 = File("/foo/bar/gav")
+        var i = 0
+        val elements1 = listOf("foo", "bar", "gav")
+        for (elem in file1) {
+            assertEquals(elements1[i++], elem.toString())
+        }
+        val file2 = File("/foo/bar/gav/")
+        i = 0
+        val elements2 = listOf("foo", "bar", "gav")
+        for (elem in file2) {
+            assertEquals(elements2[i++], elem.toString())
+        }
+        val file3 = File("bar/gav/")
+        i = 0
+        val elements3 = listOf("bar", "gav")
+        for (elem in file3) {
+            assertEquals(elements3[i++], elem.toString())
+        }
+        val file4 = File("C:\\bar\\gav")
+        i = 0
+        val elements4 = listOf("bar", "gav")
+        for (elem in file4) {
+            assertEquals(elements4[i++], elem.toString())
+        }
+        val file5 = File("C:\\")
+        for (elem in file5) {
+            assert(false);
+        }
+        val file6 = File("http://yandex")
+        i = 0
+        val elements6 = listOf("yandex")
+        for (elem in file6) {
+            assertEquals(elements6[i++], elem.toString())
+        }
+    }
+
     test fun extension() {
         assertEquals("bbb", File("aaa.bbb").extension)
         assertEquals("", File("aaa").extension)

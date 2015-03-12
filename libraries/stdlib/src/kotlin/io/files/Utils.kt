@@ -348,3 +348,5 @@ public fun File.listFiles(filter: (file: File) -> Boolean): Array<File>? = listF
             override fun accept(file: File) = filter(file)
         }
                                                                                     )
+
+public fun File.iterator(): Iterator<File> = FileIterator(this)
