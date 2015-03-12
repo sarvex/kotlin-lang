@@ -142,12 +142,32 @@ public fun File.relativeTo(base: File): String {
 
     fun String.longestCommonPrefixLen(o: String): Int {
         var i = 0
+        var lastSeparator = -1
         val len = length()
         val oLen = o.length()
+        // Provides len >= oLen
+        if (oLen > len)
+            return o.longestCommonPrefixLen(this)
         while (i < len && i < oLen && this[i] == o[i]) {
+            if (this[i] == File.separatorChar)
+                lastSeparator = i
             i++
         }
-        return i
+        if (i == oLen) {
+            // Same strings => prefix = string
+            if (i == len)
+                return i
+            // i < len, i == oLen
+            // o = /foo/bar & this = /foo/bar/gav => prefix = /foo/bar
+            if (this[i] == File.separatorChar)
+                return i
+        }
+        // i < oLen <= len
+        // o = /foo/bar/ & this = /foo/bar/gav => prefix = /foo/bar/
+        // o = /foo/bar/my & this = /foo/bar/gav => prefix = /foo/bar/
+        // o = /foo/bar & this = /foo/baran => prefix = /foo/ !!!
+        // o = /foo/bar & this = /foo/baaz => prefix = /foo/
+        return lastSeparator + 1
     }
 
     val commonPrefLen = thisCanonical.longestCommonPrefixLen(baseCanonical)
@@ -186,7 +206,7 @@ public fun File.relativePath(descendant: File): String {
 }
 
 /**
- * Copies this file to the given output [file], returning the number of bytes copied.
+ * Copies this file to the given output [dst], returning the number of bytes copied.
  * 
  * If some directories on a way to the destination are missing, then they will be created.
  * If the destination file already exists, then this function will fail unless 'overwrite' argument is set to true and

@@ -307,13 +307,26 @@ class FilesTest {
         createTempFile("temp3", ".kt", dir)
 
         val result = dir.listFiles { it.getName().endsWith(".kt") }
-        assertEquals(2, result!!.size)
+        assertEquals(2, result!!.size())
     }
 
     test fun relativeToTest() {
         val file1 = File("/foo/bar/baz")
         val file2 = File("/foo/baa/ghoo")
-        assertEquals("../../bar/baz", file1.relativeTo(file2))
+        assertEquals("../../bar/baz".separatorsToSystem(), file1.relativeTo(file2))
+        val file3 = File("/foo/bar")
+        assertEquals("baz", file1.relativeTo(file3))
+        assertEquals("..", file3.relativeTo(file1))
+        val file4 = File("/foo/bar/")
+        assertEquals("baz", file1.relativeTo(file4))
+        assertEquals("..", file4.relativeTo(file1))
+        assertEquals("", file3.relativeTo(file4))
+        assertEquals("", file4.relativeTo(file3))
+        val file5 = File("/foo/baran")
+        assertEquals("../bar".separatorsToSystem(), file3.relativeTo(file5))
+        assertEquals("../baran".separatorsToSystem(), file5.relativeTo(file3))
+        assertEquals("../bar".separatorsToSystem(), file4.relativeTo(file5))
+        assertEquals("../baran".separatorsToSystem(), file5.relativeTo(file4))
     }
 
     test fun relativeTo() {
@@ -322,6 +335,7 @@ class FilesTest {
         assertEquals("..", File("dir").relativeTo(File("dir/subdir".separatorsToSystem())))
         assertEquals("../../test".separatorsToSystem(), File("test").relativeTo(File("dir/dir".separatorsToSystem())))
 
+        // This test operates correctly only at Windows PCs with C & D drives
         val file1 = File("C:/dir1".separatorsToSystem())
         val file2 = File("D:/dir2".separatorsToSystem())
         try {
@@ -330,6 +344,8 @@ class FilesTest {
             assertEquals("../../C:/dir1", winRelPath)
         } catch (e: IllegalArgumentException) {
             assert(Character.isLetter(file1.canonicalPath.charAt(0)))
+        } catch (e: IOException) {
+            // The device is not ready (D) ==> DO NOTHING
         }
     }
 
