@@ -349,4 +349,84 @@ public fun File.listFiles(filter: (file: File) -> Boolean): Array<File>? = listF
         }
                                                                                     )
 
+/**
+ * Returns an iterator to go through name parts, e.g.
+ * /foo/bar/gav has parts foo, bar and gav
+ */
 public fun File.iterator(): Iterator<File> = FileIterator(this)
+
+/**
+ * Returns true if this file belongs to the same root as [o]
+ * and starts with all components of [o] in the same order
+ */
+public fun File.startsWith(o: File): Boolean {
+    val it = FileIterator(this)
+    val otherIt = FileIterator(o)
+    // Roots must be same OR other path can have no root
+    if (it.root != otherIt.root && otherIt.root != "")
+        return false
+    // Other path is empty
+    if (!otherIt.hasNext())
+        return true
+    val count = this.getNameCount()
+    val otherCount = o.getNameCount()
+    // This path is shorted than the other
+    if (count < otherCount)
+        return false
+    // Compare first elements until other ends
+    while (otherIt.hasNext()) {
+        if (it.next() != otherIt.next())
+            return false
+    }
+    return true
+}
+
+/**
+ * Returns true if this file belongs to the same root as [o]
+ * and starts with all components of [o] in the same order
+ */
+public fun File.startsWith(o: String): Boolean {
+    return startsWith(File(o))
+}
+
+/**
+ * Returns true if this file belongs to the same root as [o]
+ * and ends with all components of [o] in the same order
+ */
+public fun File.endsWith(o: File): Boolean {
+    val it = FileIterator(this)
+    val otherIt = FileIterator(o)
+    // Roots must be same OR other path can have no root
+    if (it.root != otherIt.root && otherIt.root != "")
+        return false
+    // Other path is empty
+    if (!otherIt.hasNext())
+        return true
+    var theirs = otherIt.next()
+    val count = this.getNameCount()
+    val otherCount = o.getNameCount()
+    // This path is shorted than the other
+    if (count < otherCount)
+        return false
+    var ours = it.next()
+    // Move forward to have same number of elements remaining
+    for (i in 0..count-otherCount-1) {
+        ours = it.next()
+    }
+    // Check all next elements are same, until the end
+    while (ours == theirs && it.hasNext() && otherIt.hasNext()) {
+        ours = it.next()
+        theirs = otherIt.next()
+    }
+    if (ours != theirs || it.hasNext() || otherIt.hasNext())
+        return false
+    return true
+}
+
+/**
+ * Returns true if this file belongs to the same root as [o]
+ * and ends with all components of [o] in the same order
+ */
+public fun File.endsWith(o: String): Boolean {
+    return endsWith(File(o))
+}

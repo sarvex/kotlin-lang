@@ -8,6 +8,9 @@ import java.io.FileNotFoundException
 import java.util.NoSuchElementException
 import java.util.HashSet
 import java.util.ArrayList
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FilesTest {
     test fun testCreateTempDir() {
@@ -359,41 +362,48 @@ class FilesTest {
         assertEquals(file3.canonicalPath, file1.relativePath(file3))
     }
 
-    test fun fileIterator() {
-        val file1 = File("/foo/bar/gav")
+    private fun checkFileElements(f: File, root: File?, elements: List<String>) {
         var i = 0
-        val elements1 = listOf("foo", "bar", "gav")
-        for (elem in file1) {
-            assertEquals(elements1[i++], elem.toString())
+        assertEquals(root, f.getRoot())
+        for (elem in f) {
+            assertTrue(i < elements.size())
+            assertEquals(elements[i++], elem.toString())
         }
-        val file2 = File("/foo/bar/gav/")
-        i = 0
-        val elements2 = listOf("foo", "bar", "gav")
-        for (elem in file2) {
-            assertEquals(elements2[i++], elem.toString())
-        }
-        val file3 = File("bar/gav/")
-        i = 0
-        val elements3 = listOf("bar", "gav")
-        for (elem in file3) {
-            assertEquals(elements3[i++], elem.toString())
-        }
-        val file4 = File("C:\\bar\\gav")
-        i = 0
-        val elements4 = listOf("bar", "gav")
-        for (elem in file4) {
-            assertEquals(elements4[i++], elem.toString())
-        }
-        val file5 = File("C:\\")
-        for (elem in file5) {
-            assert(false);
-        }
-        val file6 = File("http://yandex")
-        i = 0
-        val elements6 = listOf("yandex")
-        for (elem in file6) {
-            assertEquals(elements6[i++], elem.toString())
-        }
+        assertEquals(elements.size(), i)
+    }
+
+    test fun fileIterator() {
+        checkFileElements(File("/foo/bar"), File("/"), listOf("foo", "bar"))
+        checkFileElements(File("/foo/bar/gav"), File("/"), listOf("foo", "bar", "gav"))
+        checkFileElements(File("/foo/bar/gav/"), File("/"), listOf("foo", "bar", "gav"))
+        checkFileElements(File("bar/gav"), null, listOf("bar", "gav"))
+        checkFileElements(File("C:\\bar\\gav"), File("C:\\"), listOf("bar", "gav"))
+        checkFileElements(File("C:\\"), File("C:\\"), listOf())
+        checkFileElements(File("C:"), File("C:"), listOf())
+        checkFileElements(File("//host.ru/home/mike"), File("//host.ru/home"), listOf("mike"))
+        checkFileElements(File(""), null, listOf(""))
+        checkFileElements(File("."), null, listOf("."))
+        checkFileElements(File(".."), null, listOf(".."))
+    }
+
+    test fun startsWith() {
+        assertTrue(File("C:\\Users\\Me\\Temp\\Game").startsWith("C:\\Users\\Me"))
+        assertFalse(File("C:\\Users\\Me\\Temp\\Game").startsWith("C:\\Users\\He"))
+        assertTrue(File("C:\\Users\\Me").startsWith("C:\\"))
+    }
+
+    test fun endsWith() {
+        assertTrue(File("/foo/bar").endsWith("bar"))
+        assertTrue(File("/foo/bar").endsWith("/bar"))
+        assertTrue(File("/foo/bar/gav/bar").endsWith("/bar"))
+        assertTrue(File("/foo/bar/gav/bar").endsWith("/gav/bar"))
+        assertFalse(File("/foo/bar/gav").endsWith("/bar"))
+        assertFalse(File("foo/bar").endsWith("/bar"))
+    }
+
+    test fun subpath() {
+        assertEquals(File("mike"), File("//my.host.net/home/mike/temp").subpath(0, 1))
+        assertEquals(File("bar/gav"), File("/foo/bar/gav/hi").subpath(1, 3))
     }
 
     test fun extension() {
