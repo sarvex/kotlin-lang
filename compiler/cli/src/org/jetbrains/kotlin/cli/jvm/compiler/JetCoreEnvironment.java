@@ -24,8 +24,6 @@ import com.intellij.core.CoreApplicationEnvironment;
 import com.intellij.core.CoreJavaFileManager;
 import com.intellij.core.JavaCoreApplicationEnvironment;
 import com.intellij.core.JavaCoreProjectEnvironment;
-import com.intellij.ide.plugins.IdeaPluginDescriptorImpl;
-import com.intellij.ide.plugins.PluginManagerCoreProxy;
 import com.intellij.lang.java.JavaParserDefinition;
 import com.intellij.mock.MockApplication;
 import com.intellij.mock.MockProject;
@@ -56,8 +54,6 @@ import kotlin.Function1;
 import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
-import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension;
-import org.jetbrains.kotlin.extensions.ExternalDeclarationsProvider;
 import org.jetbrains.kotlin.asJava.JavaElementFinder;
 import org.jetbrains.kotlin.asJava.KotlinLightClassForPackage;
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport;
@@ -66,9 +62,11 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation;
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity;
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
 import org.jetbrains.kotlin.cli.jvm.JVMConfigurationKeys;
+import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension;
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar;
 import org.jetbrains.kotlin.config.CommonConfigurationKeys;
 import org.jetbrains.kotlin.config.CompilerConfiguration;
+import org.jetbrains.kotlin.extensions.ExternalDeclarationsProvider;
 import org.jetbrains.kotlin.idea.JetFileType;
 import org.jetbrains.kotlin.load.kotlin.KotlinBinaryClassCache;
 import org.jetbrains.kotlin.load.kotlin.VirtualFileFinderFactory;
@@ -200,22 +198,16 @@ public class JetCoreEnvironment {
     }
 
     private static void registerApplicationExtensionPointsAndExtensionsFrom(@NotNull CompilerConfiguration configuration, @NotNull String configFilePath) {
-        IdeaPluginDescriptorImpl descriptor;
         CompilerJarLocator locator = configuration.get(JVMConfigurationKeys.COMPILER_JAR_LOCATOR);
-        File jar = locator == null ? PathUtil.getPathUtilJar() : locator.getCompilerJar();
-        if (jar.isFile()) {
-            descriptor = PluginManagerCoreProxy.loadDescriptorFromJar(jar, configFilePath);
-        }
-        else {
+        File pluginRoot = locator == null ? PathUtil.getPathUtilJar() : locator.getCompilerJar();
+
+        if (pluginRoot.isDirectory()) {
             // hack for load extensions when compiler run directly from out directory(e.g. in tests)
-            File srcDir = jar.getParentFile().getParentFile().getParentFile();
-            File pluginDir = new File(srcDir, "idea/src");
-            descriptor = PluginManagerCoreProxy.loadDescriptorFromDir(pluginDir, configFilePath);
+            File srcDir = pluginRoot.getParentFile().getParentFile().getParentFile();
+            pluginRoot = new File(srcDir, "idea/src");
         }
 
-        assert descriptor != null : "Can not load descriptor from " + configFilePath + " relative to " + jar;
-
-        PluginManagerCoreProxy.registerExtensionPointsAndExtensions(Extensions.getRootArea(), Collections.singletonList(descriptor));
+        CoreApplicationEnvironment.registerExtensionPointAndExtensions(pluginRoot, configFilePath, Extensions.getRootArea());
     }
 
     private static void registerApplicationServicesForCLI(@NotNull JavaCoreApplicationEnvironment applicationEnvironment) {
