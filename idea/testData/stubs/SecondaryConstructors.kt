@@ -4,12 +4,23 @@ class SecondaryConstructors(x: Boolean) {
     init {
     }
 
-    constructor(x: String) : this(x == "abc") {
+    anno constructor(x: String) : this(x == "abc") {
     }
 
     init {
     }
 
-    constructor(x: Int) : this(x < 0) {
+    private constructor(x: Int) : this(x < 0) {
+    }
+
+    inner class Inner<T: String, G: Int> {
+        constructor(x: T, g: G) {}
+    }
+
+    class Nested {
+        anno constructor(z: Int) {}
+        internal constructor() {}
     }
 }
+
+annotation class anno

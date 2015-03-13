@@ -4,6 +4,17 @@
 package test
 
 internal final class SecondaryConstructors(x: kotlin.Boolean) {
-    //TODO: render constuctors
-}
+    test.anno public constructor(x: kotlin.String) { /* compiled code */ }
 
+    private constructor(x: kotlin.Int) { /* compiled code */ }
+
+    internal final inner class Inner<T : kotlin.String, G : kotlin.Int> {
+        public constructor(x: T, g: G) { /* compiled code */ }
+    }
+
+    internal final class Nested {
+        test.anno public constructor(z: kotlin.Int) { /* compiled code */ }
+
+        internal constructor() { /* compiled code */ }
+    }
+}
