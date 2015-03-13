@@ -258,6 +258,8 @@ public fun File.copyTo(dst: File, overwrite: Boolean = false, bufferSize: Int = 
                                              other = dst.toString(),
                                              reason = "The destination file already exists")
         } else if (dst.isDirectory() && dst.listFiles().any()) {
+            // Note: I would say in this case file should be copied *into* this directory,
+            // no matter whether it is empty or not
             throw DirectoryNotEmptyException(file = this.toString(),
                                              other = dst.toString(),
                                              reason = "The destination file is a non-empty directory")
