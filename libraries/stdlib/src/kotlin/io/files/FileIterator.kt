@@ -29,20 +29,23 @@ fun String.getRootName(): String {
 
 }
 
-fun File.getRootName(): String = separatorsToSystem().getRootName()
+val File.rootName: String
+    get() = separatorsToSystem().getRootName()
 
 /**
- * Returns root component of this abstract name, like / from /home/user or C:\ from C:\file.tmp
- * or null if it does not belong to any root, like bar/gav
+ * Returns root component of this abstract name, like / from /home/user, or C:\ from C:\file.tmp,
+ * or //my.host/home for //my.host/home/user,
+ * or null if this name is relative, like bar/gav
  */
-public fun File.getRoot(): File? {
-    val name = getRootName()
-    return if (name.length() > 0) File(name) else null
-}
+public val File.root: File?
+    get() {
+        val name = rootName
+        return if (name.length() > 0) File(name) else null
+    }
 
 /**
  * Iterates over elements of file, e.g. for /foo/bar/gav
- * we will have /, /foo, /foo/bar, /foo/bar/gav
+ * we will have foo, bar and gav
  */
 class FileIterator(private val f: File): Iterator<File> {
 
@@ -55,6 +58,10 @@ class FileIterator(private val f: File): Iterator<File> {
 
     private var nextIndex = separatorIndex
 
+    /**
+     * Returns the next element for this file iterator
+     * @throws NoSuchElementException if there is no next element
+     */
     override fun next(): File {
         if (!hasNext()) {
             throw NoSuchElementException()
@@ -64,6 +71,10 @@ class FileIterator(private val f: File): Iterator<File> {
         return File(path.substring(prevIndex+1, nextIndex))
     }
 
+    /**
+     * Returns true if the next element is available for this file iterator,
+     * or false otherwise
+     */
     override fun hasNext(): Boolean {
         if (nextIndex == separatorIndex) {
             // Consider special "" case
@@ -88,14 +99,16 @@ class FileIterator(private val f: File): Iterator<File> {
 }
 
 /**
- * Returns number of components in this abstract path name,
- * e.g. 3 in /home/user/tmp or 0 in /
+ * Contains number of components in this abstract path name,
+ * e.g. 3 in /home/user/tmp (home, user, tmp) or 0 in /.
+ * Empty path name has one component which is the empty name itself.
  */
-public fun File.getNameCount(): Int {
-    var i = 0
-    for (elem in this) i++
-    return i
-}
+public val File.nameCount: Int
+    get() {
+        var i = 0
+        for (elem in this) i++
+        return i
+    }
 
 /**
  * Returns a relative pathname which is a subsequence of this pathname,
@@ -103,9 +116,12 @@ public fun File.getNameCount(): Int {
  * ending at component [endIndex], exclusive.
  * Number 0 belongs to a component closest to the root,
  * number count-1 belongs to a component farthest from the root
+ * @throws IllegalArgumentException if [beginIndex] is negative,
+* or [endIndex] is greater than existing number of components,
+* or [beginIndex] is greater than or equals to [endIndex]
  */
-public fun File.subpath(beginIndex: Int, endIndex: Int): File {
-    if (beginIndex < 0 || beginIndex >= endIndex || endIndex > getNameCount())
+public fun File.subPath(beginIndex: Int, endIndex: Int): File {
+    if (beginIndex < 0 || beginIndex >= endIndex || endIndex > nameCount)
         throw IllegalArgumentException()
     var res = ""
     var i = 0

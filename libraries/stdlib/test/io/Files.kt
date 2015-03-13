@@ -330,6 +330,18 @@ class FilesTest {
         assertEquals("../baran".separatorsToSystem(), file5.relativeTo(file3))
         assertEquals("../bar".separatorsToSystem(), file4.relativeTo(file5))
         assertEquals("../baran".separatorsToSystem(), file5.relativeTo(file4))
+        val file6 = File("C:\\Users\\Me")
+        val file7 = File("C:\\Users\\Me\\Documents")
+        assertEquals("..", file6.relativeTo(file7))
+        assertEquals("Documents", file7.relativeTo(file6))
+        val file8 = File("//my.host/home/user/documents/vip")
+        val file9 = File("//my.host/home/other/images/nice")
+        assertEquals("../../../user/documents/vip".separatorsToSystem(), file8.relativeTo(file9))
+        assertEquals("../../../other/images/nice".separatorsToSystem(), file9.relativeTo(file8))
+        val file10 = File("foo/bar")
+        val file11 = File("foo")
+        assertEquals("bar", file10.relativeTo(file11))
+        assertEquals("..", file11.relativeTo(file10))
     }
 
     test fun relativeTo() {
@@ -364,7 +376,7 @@ class FilesTest {
 
     private fun checkFileElements(f: File, root: File?, elements: List<String>) {
         var i = 0
-        assertEquals(root, f.getRoot())
+        assertEquals(root, f.root)
         for (elem in f) {
             assertTrue(i < elements.size())
             assertEquals(elements[i++], elem.toString())
@@ -401,9 +413,32 @@ class FilesTest {
         assertFalse(File("foo/bar").endsWith("/bar"))
     }
 
-    test fun subpath() {
-        assertEquals(File("mike"), File("//my.host.net/home/mike/temp").subpath(0, 1))
-        assertEquals(File("bar/gav"), File("/foo/bar/gav/hi").subpath(1, 3))
+    test fun subPath() {
+        assertEquals(File("mike"), File("//my.host.net/home/mike/temp").subPath(0, 1))
+        assertEquals(File("bar/gav"), File("/foo/bar/gav/hi").subPath(1, 3))
+    }
+
+    test fun normalize() {
+        assertEquals(File("/foo/bar/baaz"), File("/foo/./bar/gav/../baaz").normalize())
+        assertEquals(File("../../bar"), File("../foo/../../bar").normalize())
+        assertEquals(File("C:\\windows"), File("C:\\home\\..\\documents\\..\\windows").normalize())
+        assertEquals(File("foo"), File("gav/bar/../../foo").normalize())
+    }
+
+    test fun resolve() {
+        assertEquals(File("/foo/bar/gav"), File("/foo/bar").resolve("gav"))
+        assertEquals(File("/foo/bar/gav"), File("/foo/bar/").resolve("gav"))
+        assertEquals(File("/gav"), File("/foo/bar").resolve("/gav"))
+        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc"),
+                File("C:\\Users\\Me").resolve("Documents\\important.doc"))
+    }
+
+    test fun resolveSibling() {
+        assertEquals(File("/foo/gav"), File("/foo/bar").resolveSibling("gav"))
+        assertEquals(File("/foo/gav"), File("/foo/bar/").resolveSibling("gav"))
+        assertEquals(File("/gav"), File("/foo/bar").resolveSibling("/gav"))
+        assertEquals(File("C:\\Users\\Me\\Documents\\important.doc"),
+                File("C:\\Users\\Me\\profile.ini").resolveSibling("Documents\\important.doc"))
     }
 
     test fun extension() {
