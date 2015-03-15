@@ -154,7 +154,7 @@ public class CandidateResolver {
             candidateCall.setResultingSubstitutor(substitutor);
         }
 
-        if (jetTypeArguments.isEmpty() && !candidate.getTypeParameters().isEmpty()) {
+        if (candidateCall.hasTypeParametersToInfer()) {
             candidateCall.addStatus(inferTypeArguments(context));
         }
         else {
@@ -516,7 +516,8 @@ public class CandidateResolver {
                 if (expression == null) continue;
 
                 JetType expectedType = getEffectiveExpectedType(parameterDescriptor, argument);
-                if (TypeUtils.dependsOnTypeParameters(expectedType, candidateCall.getCandidateDescriptor().getTypeParameters())) {
+                if (candidateCall.hasTypeParametersToInfer() &&
+                    TypeUtils.dependsOnTypeParameters(expectedType, candidateCall.getCandidateDescriptor().getTypeParameters())) {
                     expectedType = NO_EXPECTED_TYPE;
                 }
 

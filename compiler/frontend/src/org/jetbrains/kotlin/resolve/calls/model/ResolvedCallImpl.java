@@ -323,4 +323,10 @@ public class ResolvedCallImpl<D extends CallableDescriptor> implements MutableRe
     private void assertNotCompleted(String elementName) {
         assert !completed: elementName + " is erased after resolution completion.";
     }
+
+    @Override
+    public boolean hasTypeParametersToInfer() {
+        return getCall().getTypeArguments().isEmpty() &&
+               !getCandidateDescriptor().getTypeParameters().isEmpty();
+    }
 }
